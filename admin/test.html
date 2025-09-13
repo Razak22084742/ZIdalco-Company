@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Test</title>
+    <style>
+        .hidden { display: none !important; }
+        .login-section { background: #f0f0f0; padding: 20px; }
+        .dashboard-section { background: #e0e0e0; padding: 20px; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div id="loginSection" class="login-section">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email" value="admin@zidalco.com">
+            <input type="password" id="loginPassword" placeholder="Password" value="admin123">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="dashboardSection" class="dashboard-section hidden">
+        <h2>Dashboard</h2>
+        <nav>
+            <button class="nav-item" data-section="dashboard">Dashboard</button>
+            <button class="nav-item" data-section="feedback">Feedback</button>
+            <button class="nav-item" data-section="emails">Emails</button>
+        </nav>
+        <div id="content">
+            <div id="dashboard" class="content-section">Dashboard Content</div>
+            <div id="feedback" class="content-section hidden">Feedback Content</div>
+            <div id="emails" class="content-section hidden">Emails Content</div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Test script loaded');
+        
+        class TestAdmin {
+            constructor() {
+                console.log('TestAdmin constructor called');
+                this.token = null;
+                this.init();
+            }
+            
+            init() {
+                console.log('TestAdmin init called');
+                this.setupEventListeners();
+                this.checkAuth();
+            }
+            
+            setupEventListeners() {
+                console.log('Setting up event listeners');
+                
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+                
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    console.log('Setting up nav listener for:', item.dataset.section);
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('Nav clicked:', item.dataset.section);
+                        this.navigateToSection(item.dataset.section);
+                    });
+                });
+            }
+            
+            checkAuth() {
+                console.log('checkAuth called, token:', this.token);
+                if (this.token) {
+                    this.showDashboard();
+                } else {
+                    this.showLogin();
+                }
+            }
+            
+            showLogin() {
+                console.log('showLogin called');
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+            }
+            
+            showDashboard() {
+                console.log('showDashboard called');
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+            }
+            
+            handleLogin() {
+                console.log('handleLogin called');
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                if (email === 'admin@zidalco.com' && password === 'admin123') {
+                    this.token = 'test-token';
+                    this.showDashboard();
+                } else {
+                    alert('Invalid credentials');
+                }
+            }
+            
+            navigateToSection(section) {
+                console.log('navigateToSection called with:', section);
+                
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`[data-section="${section}"]`).classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
+                document.getElementById(section).classList.remove('hidden');
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing TestAdmin');
+            window.testAdmin = new TestAdmin();
+        });
+    </script>
+</body>
+</html>

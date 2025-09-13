@@ -1,4 +1,6 @@
 // Admin Dashboard JavaScript
+console.log('admin.js file loaded successfully');
+
 class AdminDashboard {
     constructor() {
         console.log('AdminDashboard constructor called');
@@ -1624,11 +1626,28 @@ function replyToFeedback(feedbackId) {
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Admin dashboard initializing...');
+    console.log('DOM loaded, admin dashboard initializing...');
+    
+    // Check if required elements exist
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const loginForm = document.getElementById('loginForm');
+    
+    console.log('Required elements check:');
+    console.log('- loginSection:', !!loginSection);
+    console.log('- dashboardSection:', !!dashboardSection);
+    console.log('- loginForm:', !!loginForm);
+    
+    if (!loginSection || !dashboardSection || !loginForm) {
+        console.error('Missing required DOM elements!');
+        return;
+    }
+    
     try {
         window.adminDashboard = new AdminDashboard();
         console.log('Admin dashboard initialized successfully');
     } catch (error) {
         console.error('Failed to initialize admin dashboard:', error);
+        console.error('Error stack:', error.stack);
     }
 });
