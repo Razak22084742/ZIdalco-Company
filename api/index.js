@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -10,8 +11,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the root of the project
-app.use(express.static(path.join(__dirname, '..')));
+// Serve static files with proper MIME types
+app.use(express.static(path.join(__dirname, '..'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html');
+    }
+  }
+}));
 
 // Basic API endpoints (simplified to avoid crashes)
 app.get('/api/health', (req, res) => {
@@ -48,6 +59,27 @@ app.post('/api/auth/login', (req, res) => {
     });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// Handle static files explicitly
+app.get('*.css', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/css');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('CSS file not found');
+  }
+});
+
+app.get('*.js', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('JS file not found');
   }
 });
 
