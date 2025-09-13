@@ -41,12 +41,16 @@ app.post('/api/auth/login', (req, res) => {
   
   if (email === 'admin@zidalco.com' && password === 'admin123') {
     res.json({
+      success: true,
       message: 'Login successful',
       token: 'mock-token-' + Date.now(),
-      user: { email: 'admin@zidalco.com', name: 'Admin' }
+      admin: { email: 'admin@zidalco.com', name: 'Admin' }
     });
   } else {
-    res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ 
+      success: false,
+      error: 'Invalid credentials' 
+    });
   }
 });
 
