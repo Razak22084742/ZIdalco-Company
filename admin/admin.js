@@ -1,6 +1,7 @@
 // Admin Dashboard JavaScript
 class AdminDashboard {
     constructor() {
+        console.log('AdminDashboard constructor called');
         this.token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
         this.admin = JSON.parse(localStorage.getItem('admin_data') || sessionStorage.getItem('admin_data') || '{}');
         this.currentSection = 'dashboard';
@@ -15,14 +16,25 @@ class AdminDashboard {
         this.warningTimer = null;
         this.isWarningShown = false;
         
+        console.log('AdminDashboard constructor completed, calling init()');
         this.init();
     }
     
     init() {
-        this.setupEventListeners();
-        this.checkAuth();
-        this.startNotificationPolling();
-        this.startSessionManagement();
+        console.log('AdminDashboard init() called');
+        try {
+            this.setupEventListeners();
+            console.log('Event listeners setup complete');
+            this.checkAuth();
+            console.log('Auth check complete');
+            this.startNotificationPolling();
+            console.log('Notification polling started');
+            this.startSessionManagement();
+            console.log('Session management started');
+            console.log('AdminDashboard init() completed successfully');
+        } catch (error) {
+            console.error('Error in AdminDashboard init():', error);
+        }
     }
     
     setupEventListeners() {
@@ -1553,5 +1565,11 @@ function replyToFeedback(feedbackId) {
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.adminDashboard = new AdminDashboard();
+    console.log('Admin dashboard initializing...');
+    try {
+        window.adminDashboard = new AdminDashboard();
+        console.log('Admin dashboard initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize admin dashboard:', error);
+    }
 });
