@@ -11,20 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files with proper MIME types
-app.use(express.static(path.join(__dirname, '..'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (filePath.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html');
-    }
-  }
-}));
-
-// Basic API endpoints (simplified to avoid crashes)
+// API endpoints
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -62,36 +49,93 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
-// Handle static files explicitly
+// Handle CSS files
 app.get('*.css', (req, res) => {
   const filePath = path.join(__dirname, '..', req.path);
+  console.log('CSS request:', req.path, 'File exists:', fs.existsSync(filePath));
+  
   if (fs.existsSync(filePath)) {
-    res.setHeader('Content-Type', 'text/css');
+    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
     res.sendFile(filePath);
   } else {
-    res.status(404).send('CSS file not found');
+    console.log('CSS file not found:', filePath);
+    res.status(404).send('/* CSS file not found */');
   }
 });
 
+// Handle JS files
 app.get('*.js', (req, res) => {
   const filePath = path.join(__dirname, '..', req.path);
+  console.log('JS request:', req.path, 'File exists:', fs.existsSync(filePath));
+  
   if (fs.existsSync(filePath)) {
-    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
     res.sendFile(filePath);
   } else {
-    res.status(404).send('JS file not found');
+    console.log('JS file not found:', filePath);
+    res.status(404).send('// JS file not found');
   }
 });
 
-// Catch-all handler for SPA
+// Handle images
+app.get('*.png', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/png');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('Image not found');
+  }
+});
+
+app.get('*.jpg', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('Image not found');
+  }
+});
+
+app.get('*.jpeg', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('Image not found');
+  }
+});
+
+// Handle HTML files
+app.get('*.html', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  console.log('HTML request:', req.path, 'File exists:', fs.existsSync(filePath));
+  
+  if (fs.existsSync(filePath)) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('HTML file not found');
+  }
+});
+
+// Catch-all handler - serve index.html for SPA routing
 app.get('*', (req, res) => {
   // Check if it's an API route
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   
-  // Default to index.html for SPA routing
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  console.log('Catch-all request:', req.path);
+  const indexPath = path.join(__dirname, '..', 'index.html');
+  console.log('Serving index.html from:', indexPath, 'Exists:', fs.existsSync(indexPath));
+  
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.sendFile(indexPath);
 });
 
 // Error handling middleware
