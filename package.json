@@ -6,20 +6,21 @@
   "scripts": {
     "start": "node api/index.js",
     "dev": "node api/index.js",
-    "build": "echo 'No build step required'"
+    "build": "echo 'Express app - no build step required'"
   },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   },
   "keywords": [
     "zidalco",
     "construction",
     "customer-feedback",
-    "admin-dashboard"
+    "admin-dashboard",
+    "express"
   ],
   "author": "Zidalco Company Limited",
   "license": "MIT"
