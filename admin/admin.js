@@ -74,8 +74,13 @@ class AdminDashboard {
         if (forgotBtn) forgotBtn.addEventListener('click', () => this.handleForgotPassword());
         
         // Navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
+        console.log('Setting up navigation listeners...');
+        const navItems = document.querySelectorAll('.nav-item');
+        console.log('Found nav items:', navItems.length);
+        navItems.forEach((item, index) => {
+            console.log(`Setting up listener for nav item ${index}:`, item.dataset.section);
             item.addEventListener('click', (e) => {
+                console.log('Nav item clicked:', item.dataset.section);
                 e.preventDefault();
                 this.navigateToSection(item.dataset.section);
             });
@@ -248,13 +253,27 @@ class AdminDashboard {
     }
     
     navigateToSection(section) {
+        console.log('navigateToSection called with:', section);
+        
         // Update navigation
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        document.querySelector(`[data-section="${section}"]`).classList.add('active');
+        const activeNavItem = document.querySelector(`[data-section="${section}"]`);
+        if (activeNavItem) {
+            activeNavItem.classList.add('active');
+            console.log('Updated navigation for:', section);
+        } else {
+            console.error('Could not find nav item for section:', section);
+        }
         
         // Update content
         document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-        document.getElementById(section).classList.add('active');
+        const activeSection = document.getElementById(section);
+        if (activeSection) {
+            activeSection.classList.add('active');
+            console.log('Updated content section for:', section);
+        } else {
+            console.error('Could not find content section for:', section);
+        }
         
         // Update page title
         document.getElementById('pageTitle').textContent = this.getSectionTitle(section);
