@@ -1,0 +1,276 @@
+{
+  "feedbackData": [
+    {
+      "id": 1757771293358.89,
+      "name": "Nino",
+      "email": "unknown@local",
+      "phone": "",
+      "message": "more",
+      "type": "general",
+      "status": "replied",
+      "is_read": true,
+      "created_at": "2025-09-13T13:48:13.358Z"
+    },
+    {
+      "id": 1757768677547.917,
+      "name": "Godfred",
+      "email": "unknown@local",
+      "phone": "",
+      "message": "working ?",
+      "type": "general",
+      "status": "replied",
+      "is_read": true,
+      "created_at": "2025-09-13T13:04:37.547Z"
+    },
+    {
+      "id": 1757729691078.8167,
+      "name": "razak",
+      "email": "unknown@local",
+      "phone": "",
+      "message": "nice work",
+      "type": "general",
+      "status": "replied",
+      "is_read": true,
+      "created_at": "2025-09-13T02:14:51.078Z"
+    }
+  ],
+  "emailData": [
+    {
+      "id": 1757781279040.8748,
+      "sender_name": "abdul Razak",
+      "sender_email": "arazakabu123@gmail.com",
+      "sender_phone": "0208383967",
+      "message": "testing website last",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": false,
+      "created_at": "2025-09-13T16:34:39.040Z"
+    },
+    {
+      "id": 1757781132597.015,
+      "sender_name": "Test User",
+      "sender_email": "user@test.com",
+      "sender_phone": "1234567890",
+      "message": "Testing email recipient fix",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": false,
+      "created_at": "2025-09-13T16:32:12.597Z"
+    },
+    {
+      "id": 1757780986146.6328,
+      "sender_name": "abdul Razak",
+      "sender_email": "arazakabu123@gmail.com",
+      "sender_phone": "0208383967",
+      "message": "testing website",
+      "recipient_email": "arazakabu456@gmail.com",
+      "status": "sent",
+      "is_read": false,
+      "created_at": "2025-09-13T16:29:46.146Z"
+    },
+    {
+      "id": 1757780691712.276,
+      "sender_name": "abdul Razak",
+      "sender_email": "arazakabu123@gmail.com",
+      "sender_phone": "0208383967",
+      "message": "testing website last",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T16:24:51.712Z"
+    },
+    {
+      "id": 1757780447973.5796,
+      "sender_name": "Contact Test",
+      "sender_email": "user@test.com",
+      "sender_phone": "1234567890",
+      "message": "Testing contact form recipient email",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": false,
+      "created_at": "2025-09-13T16:20:47.973Z"
+    },
+    {
+      "id": 1757780425209.3972,
+      "sender_name": "Test User",
+      "sender_email": "test@example.com",
+      "sender_phone": "1234567890",
+      "message": "Test message",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": false,
+      "created_at": "2025-09-13T16:20:25.209Z"
+    },
+    {
+      "id": 1757777692160.7185,
+      "sender_name": "abdul Razak",
+      "sender_email": "arazakabu123@gmail.com",
+      "sender_phone": "0208383967",
+      "message": "testing website to admin",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T15:34:52.160Z"
+    },
+    {
+      "id": 1757777644199.71,
+      "sender_name": "Final Test",
+      "sender_email": "final@test.com",
+      "sender_phone": "1234567890",
+      "message": "Final test message",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T15:34:04.199Z"
+    },
+    {
+      "id": 1757776821016.6108,
+      "sender_name": "Test User",
+      "sender_email": "user@example.com",
+      "sender_phone": "1234567890",
+      "message": "Test message with correct fields",
+      "recipient_email": "zidalcoltd@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T15:20:21.016Z"
+    },
+    {
+      "id": 1757776534147.7598,
+      "sender_name": "Contact Test",
+      "sender_email": "contact@test.com",
+      "sender_phone": "1234567890",
+      "message": "Test from contact form",
+      "recipient_email": "admin@zidalco.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T15:15:34.147Z"
+    },
+    {
+      "id": 1757776150617.2576,
+      "sender_name": "Test User",
+      "sender_email": "test@example.com",
+      "sender_phone": "1234567890",
+      "message": "Test message",
+      "recipient_email": "admin@zidalco.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T15:09:10.617Z"
+    },
+    {
+      "id": 1757771515994.934,
+      "sender_name": "abdul Razak",
+      "sender_email": "zidalcoltd@gmail.com",
+      "sender_phone": "0208383967",
+      "message": "testing website",
+      "recipient_email": "arazakabu123@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T13:51:55.994Z"
+    },
+    {
+      "id": 1757768122456.8875,
+      "sender_name": "Godfred",
+      "sender_email": "zidalcoltd@gmail.com",
+      "sender_phone": "0550477759",
+      "message": "testing website",
+      "recipient_email": "innocentgh10@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T12:55:22.456Z"
+    },
+    {
+      "id": 1757728012291.6633,
+      "sender_name": "Abdul Razak Abubakar",
+      "sender_email": "zidalcoltd@gmail.com",
+      "sender_phone": "0537111807",
+      "message": "site testing",
+      "recipient_email": "arazakabu123@gmail.com",
+      "status": "sent",
+      "is_read": true,
+      "created_at": "2025-09-13T01:46:52.291Z"
+    }
+  ],
+  "contentData": [
+    {
+      "id": 1757781808254.2437,
+      "location": "home",
+      "slot": "announcement",
+      "title": null,
+      "body": null,
+      "image_url": null,
+      "is_published": false,
+      "created_at": "2025-09-13T16:43:28.254Z",
+      "is_deleted": true
+    },
+    {
+      "id": 1757781662603.9067,
+      "location": "services",
+      "slot": "services_message",
+      "title": "Services Update",
+      "body": "We have expanded our services to include new construction techniques and materials.",
+      "image_url": null,
+      "is_published": true,
+      "created_at": "2025-09-13T16:41:02.603Z"
+    },
+    {
+      "id": 1757780455016.636,
+      "location": "portfolio",
+      "slot": "portfolio_message",
+      "title": "Our Portfolio",
+      "body": "Check out our amazing portfolio of completed projects.",
+      "image_url": null,
+      "is_published": true,
+      "created_at": "2025-09-13T16:20:55.016Z"
+    },
+    {
+      "id": 1757778087566.727,
+      "location": "home",
+      "slot": "announcement",
+      "title": "Test Announcement",
+      "body": "This is a test announcement from the admin portal.",
+      "image_url": null,
+      "is_published": false,
+      "created_at": "2025-09-13T15:41:27.566Z",
+      "is_deleted": true
+    }
+  ],
+  "feedbackReplies": [
+    {
+      "id": 1757771327062.3416,
+      "feedback_id": 1757771293358.89,
+      "reply_message": "good",
+      "admin_name": "Admin",
+      "created_at": "2025-09-13T13:48:47.062Z"
+    },
+    {
+      "id": 1757768694729.9282,
+      "feedback_id": 1757768677547.917,
+      "reply_message": "kind of",
+      "admin_name": "Admin",
+      "created_at": "2025-09-13T13:04:54.729Z"
+    },
+    {
+      "id": 1757768294168.2212,
+      "feedback_id": "1757729691078.8167",
+      "reply_message": "Thanks",
+      "admin_name": "Admin",
+      "created_at": "2025-09-13T12:58:14.168Z"
+    }
+  ],
+  "emailReplies": [
+    {
+      "id": 1757771540032.4626,
+      "email_id": 1757771515994.934,
+      "reply_message": "alright",
+      "admin_name": "Admin",
+      "created_at": "2025-09-13T13:52:20.032Z"
+    },
+    {
+      "id": 1757771468265.5298,
+      "email_id": 1757768122456.8875,
+      "reply_message": "alright",
+      "admin_name": "Admin",
+      "created_at": "2025-09-13T13:51:08.265Z"
+    }
+  ]
+}
