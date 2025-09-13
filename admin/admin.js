@@ -231,24 +231,64 @@ class AdminDashboard {
     }
     
     checkAuth() {
+        console.log('checkAuth called, token:', this.token);
         if (this.token) {
+            console.log('Token found, showing dashboard');
             this.showDashboard();
             this.loadDashboardData();
         } else {
+            console.log('No token found, showing login');
             this.showLogin();
         }
     }
     
     showLogin() {
-        document.getElementById('loginSection').classList.remove('hidden');
-        document.getElementById('dashboardSection').classList.add('hidden');
+        console.log('showLogin called');
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        
+        if (loginSection) {
+            loginSection.classList.remove('hidden');
+            console.log('Login section shown');
+        } else {
+            console.error('Login section not found');
+        }
+        
+        if (dashboardSection) {
+            dashboardSection.classList.add('hidden');
+            console.log('Dashboard section hidden');
+        } else {
+            console.error('Dashboard section not found');
+        }
     }
     
     showDashboard() {
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('dashboardSection').classList.remove('hidden');
+        console.log('showDashboard called');
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
         
-        document.getElementById('adminName').textContent = this.admin.name || this.admin.email || 'Admin';
+        if (loginSection) {
+            loginSection.classList.add('hidden');
+            console.log('Login section hidden');
+        } else {
+            console.error('Login section not found');
+        }
+        
+        if (dashboardSection) {
+            dashboardSection.classList.remove('hidden');
+            console.log('Dashboard section shown');
+        } else {
+            console.error('Dashboard section not found');
+        }
+        
+        const adminName = document.getElementById('adminName');
+        if (adminName) {
+            adminName.textContent = this.admin.name || this.admin.email || 'Admin';
+            console.log('Admin name set to:', adminName.textContent);
+        } else {
+            console.error('Admin name element not found');
+        }
+        
         this.navigateToSection('dashboard');
     }
     
