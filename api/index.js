@@ -1,6 +1,8 @@
-// Vercel serverless function entry point - API only
+// Vercel serverless function entry point - Full API
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const os = require('os');
 
 const app = express();
 
@@ -9,49 +11,108 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API endpoints
+// Import all the route modules
+const feedbackRoutes = require('../routes/feedback');
+const emailRoutes = require('../routes/emails');
+const adminRoutes = require('../routes/admin');
+const authRoutes = require('../routes/auth');
+const { supabaseRequest } = require('../utils/supabase');
+
+// API Routes
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/emails', emailRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
+
+// Public read for site contents
+app.get('/api/contents', async (req, res) => {
+  try {
+    const { location, slot, limit = 20, offset = 0 } = req.query;
+    let query = `contents?is_deleted=eq.false&is_published=eq.true&order=created_at.desc&limit=${limit}&offset=${offset}`;
+    if (location) query += `&location=eq.${location}`;
+    if (slot) query += `&slot=eq.${slot}`;
+    const result = await supabaseRequest(query, 'GET');
+    if (result.status === 200) return res.json({ success: true, contents: result.data });
+    return res.status(500).json({ error: true, message: 'Failed to fetch contents' });
+  } catch (e) {
+    res.status(500).json({ error: true, message: 'Failed to fetch contents' });
+  }
+});
+
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/feedback', (req, res) => {
-  res.json({ message: 'Feedback API - Working', data: [] });
+// Serve static files for Vercel
+app.use(express.static(path.join(__dirname, '..')));
+
+// Handle CSS files
+app.get('*.css', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'text/css; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=31536000');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('/* CSS file not found */');
+  });
 });
 
-app.post('/api/feedback', (req, res) => {
-  res.json({ message: 'Feedback submitted successfully', id: Date.now() });
+// Handle JS files
+app.get('*.js', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=31536000');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('// JS file not found');
+  });
 });
 
-app.get('/api/admin', (req, res) => {
-  res.json({ message: 'Admin API - Working', stats: { total_feedback: 0, total_emails: 0 } });
+// Handle images
+app.get('*.png', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'image/png');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('Image not found');
+  });
 });
 
-app.get('/api/emails', (req, res) => {
-  res.json({ message: 'Emails API - Working', data: [] });
+app.get('*.jpg', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('Image not found');
+  });
 });
 
-app.post('/api/emails', (req, res) => {
-  res.json({ message: 'Email sent successfully', id: Date.now() });
+app.get('*.jpeg', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('Image not found');
+  });
 });
 
-// Fixed admin login
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  console.log('Login attempt:', { email, password });
-  
-  if (email === 'admin@zidalco.com' && password === 'admin123') {
-    res.json({
-      success: true,
-      message: 'Login successful',
-      token: 'mock-token-' + Date.now(),
-      admin: { email: 'admin@zidalco.com', name: 'Admin' }
-    });
-  } else {
-    res.status(401).json({ 
-      success: false,
-      error: 'Invalid credentials' 
-    });
+// Handle HTML files
+app.get('*.html', (req, res) => {
+  const filePath = path.join(__dirname, '..', req.path);
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.sendFile(filePath, (err) => {
+    if (err) res.status(404).send('HTML file not found');
+  });
+});
+
+// Catch-all handler - serve index.html for SPA routing
+app.get('*', (req, res) => {
+  // Check if it's an API route
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
   }
+
+  const indexPath = path.join(__dirname, '..', 'index.html');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.sendFile(indexPath, (err) => {
+    if (err) res.status(404).send('Page not found');
+  });
 });
 
 // Error handling middleware
