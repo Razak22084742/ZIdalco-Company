@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Feedback Form</title>
+    <script src="assets/js/api-config.js"></script>
+</head>
+<body>
+    <h1>Debug Feedback Form</h1>
+    
+    <form id="debugFeedbackForm">
+        <input type="text" name="name" placeholder="Name" required>
+        <textarea name="message" placeholder="Message" required></textarea>
+        <button type="submit">Submit Feedback</button>
+    </form>
+    
+    <div id="debugResults"></div>
+    
+    <script>
+        console.log('API Config:', window.API_CONFIG);
+        console.log('API Base URL:', window.API_CONFIG.baseUrl);
+        
+        document.getElementById('debugFeedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submitted!');
+            
+            const formData = new FormData(e.target);
+            const name = formData.get('name');
+            const message = formData.get('message');
+            
+            console.log('Form data:', { name, message });
+            
+            const result = document.getElementById('debugResults');
+            result.innerHTML = '<p>Submitting...</p>';
+            
+            try {
+                console.log('Making API call to:', window.API_CONFIG.baseUrl + '/api/feedback/submit');
+                
+                const response = await apiCall('/api/feedback/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        message: message,
+                        type: 'general'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                result.innerHTML = '<h3>Success!</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Error:', error);
+                result.innerHTML = '<h3>Error:</h3><pre>' + error.message + '</pre>';
+            }
+        });
+    </script>
+</body>
+</html>

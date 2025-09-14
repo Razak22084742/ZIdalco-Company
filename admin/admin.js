@@ -325,7 +325,7 @@ class AdminDashboard {
                 const feedbackWithReplies = await Promise.all(
                     data.feedback.map(async (feedback) => {
                         try {
-                            const replyResponse = await fetch(`/api/feedback/${feedback.id}`);
+                            const replyResponse = await fetch(`${this.apiBaseUrl}/api/feedback/${feedback.id}`);
                             const replyData = await replyResponse.json();
                             const replies = replyData.success && replyData.feedback.replies ? replyData.feedback.replies : [];
                             
@@ -413,7 +413,7 @@ class AdminDashboard {
     async removeFeedback(id) {
         if (!confirm('Are you sure you want to remove this feedback?')) return;
         try {
-            const response = await fetch(`/api/admin/feedback/${id}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/feedback/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${this.token}`
@@ -435,7 +435,7 @@ class AdminDashboard {
     async loadEmails() {
         try {
             const statusFilter = document.getElementById('emailStatusFilter').value;
-            const url = `/api/admin/emails?limit=50${statusFilter ? `&status=${statusFilter}` : ''}`;
+            const url = `${this.apiBaseUrl}/api/admin/emails?limit=50${statusFilter ? `&status=${statusFilter}` : ''}`;
             
             const response = await fetch(url, {
                 headers: {
@@ -500,7 +500,7 @@ class AdminDashboard {
     async removeEmail(id) {
         if (!confirm('Are you sure you want to remove this email?')) return;
         try {
-            const response = await fetch(`/api/admin/emails/${id}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/emails/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
@@ -586,7 +586,7 @@ class AdminDashboard {
 
     async editContent(id) {
         try {
-            const response = await fetch(`/api/admin/contents?id=eq.${id}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/contents?id=eq.${id}`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -640,7 +640,7 @@ class AdminDashboard {
             let response;
             if (this.currentContentId) {
                 // Update existing content
-                response = await fetch(`/api/admin/contents/${this.currentContentId}`, {
+                response = await fetch(`${this.apiBaseUrl}/api/admin/contents/${this.currentContentId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -681,7 +681,7 @@ class AdminDashboard {
         if (!confirm('Remove this content?')) return;
         
         try {
-            const response = await fetch(`/api/admin/contents/${id}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/contents/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${this.token}`

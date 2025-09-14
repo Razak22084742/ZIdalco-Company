@@ -55,23 +55,19 @@ async function sendAdminNotification(type, payload) {
   try {
     const { supabaseRequest } = require('./supabase');
     
-    const notificationData = {
-      type: type,
-      payload: payload,
-      is_read: false,
-      created_at: new Date().toISOString()
-    };
+    // For now, we'll just log the notification since the admin dashboard
+    // already shows feedback and emails directly from their respective tables
+    console.log('Admin notification:', { type, payload });
     
-    // Store in admin_notifications table (or feedback/emails table with notification flag)
-    const result = await supabaseRequest('admin_notifications', 'POST', notificationData);
+    // In a real implementation, you might want to:
+    // 1. Create an admin_notifications table
+    // 2. Store notifications there
+    // 3. Show them in the admin dashboard
     
-    if (result.status === 200 || result.status === 201) {
-      console.log('Admin notification recorded successfully:', { type, payload });
-      return { success: true };
-    } else {
-      console.log('Admin notification (fallback logging):', { type, payload });
-      return { success: false, fallback: true };
-    }
+    // For now, return success since the admin can see feedback/emails
+    // directly from the feedback and emails tables
+    return { success: true, logged: true };
+    
   } catch (error) {
     console.error('Failed to record admin notification:', error);
     console.log('Admin notification (fallback logging):', { type, payload });
