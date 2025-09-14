@@ -10,7 +10,9 @@ class AdminDashboard {
         // API URL configuration for production
         this.apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : (window.NEXT_PUBLIC_API_URL || 'https://zidalco-api-5nf2.onrender.com');
+            : 'https://zidalco-api-5nf2.onrender.com';
+        
+        console.log('Admin API Base URL:', this.apiBaseUrl);
         
         this.init();
     }
@@ -309,7 +311,7 @@ class AdminDashboard {
     async loadFeedback() {
         try {
             const statusFilter = document.getElementById('feedbackStatusFilter').value;
-            const url = `/api/admin/feedback?limit=50${statusFilter ? `&status=${statusFilter}` : ''}`;
+            const url = `${this.apiBaseUrl}/api/admin/feedback?limit=50${statusFilter ? `&status=${statusFilter}` : ''}`;
             
             const response = await fetch(url, {
                 headers: {
