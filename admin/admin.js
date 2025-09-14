@@ -10,7 +10,7 @@ class AdminDashboard {
         // API URL configuration for production
         this.apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://zidalco-api.onrender.com';
+            : 'https://zidalco-api-5nf2.onrender.com';  // Your actual Render URL
         
         this.init();
     }
