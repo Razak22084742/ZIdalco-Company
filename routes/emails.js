@@ -81,6 +81,15 @@ router.post('/send', async (req, res) => {
 
   } catch (error) {
     console.error('Email submission error:', error);
+    
+    // If it's a Supabase connection error, provide a more user-friendly message
+    if (error.message && error.message.includes('ENOTFOUND')) {
+      return res.status(500).json({
+        error: true,
+        message: 'Service temporarily unavailable. Please try again later.'
+      });
+    }
+    
     res.status(500).json({
       error: true,
       message: error.message || 'Failed to send email'

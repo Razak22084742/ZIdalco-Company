@@ -32,7 +32,100 @@ function mockCreated(data) {
 	return { status: 201, data: [{ id: Date.now(), ...data }] };
 }
 
+// Mock Supabase request function for fallback
+async function mockSupabaseRequest(endpoint, method = 'GET', data = null) {
+	const lowerEndpoint = String(endpoint).toLowerCase();
+	console.log('Mock Supabase request (fallback):', method, endpoint);
+	
+	// Handle feedback operations
+	if (lowerEndpoint.startsWith('feedback') && !lowerEndpoint.startsWith('feedback_replies')) {
+		if (method === 'GET') {
+			const queryString = endpoint.includes('?') ? endpoint.split('?')[1] : '';
+			const params = new URLSearchParams(queryString);
+			const limit = parseInt(params.get('limit')) || 50;
+			const offset = parseInt(params.get('offset')) || 0;
+			let status = params.get('status');
+			const id = params.get('id');
+			
+			if (status && status.startsWith('eq.')) {
+				status = status.substring(3);
+			} else if (status && status.startsWith('neq.')) {
+				status = status.substring(4);
+			}
+			
+			if (id) {
+				const actualId = id.startsWith('eq.') ? id.substring(3) : id;
+				const allFeedback = mockDb.getFeedback(100, 0);
+				const feedback = allFeedback.find(f => f.id == actualId);
+				return { status: 200, data: feedback ? [feedback] : [] };
+			} else if (lowerEndpoint.includes('select=count')) {
+				const count = mockDb.getFeedbackCount(status);
+				return { status: 200, data: [{ count }] };
+			} else {
+				const feedback = mockDb.getFeedback(limit, offset, status);
+				return { status: 200, data: feedback };
+			}
+		} else if (method === 'POST') {
+			const newFeedback = mockDb.addFeedback(data);
+			return { status: 201, data: [newFeedback] };
+		} else if (method === 'PATCH') {
+			const idMatch = endpoint.match(/id=eq\.([\d.]+)/);
+			if (idMatch) {
+				const id = idMatch[1];
+				const updated = mockDb.updateFeedback(id, data);
+				return updated ? { status: 200, data: [updated] } : { status: 404, data: [] };
+			}
+			return { status: 400, data: [] };
+		}
+	}
+	
+	// Handle email operations
+	if (lowerEndpoint.startsWith('emails')) {
+		if (method === 'GET') {
+			const queryString = endpoint.includes('?') ? endpoint.split('?')[1] : '';
+			const params = new URLSearchParams(queryString);
+			const limit = parseInt(params.get('limit')) || 50;
+			const offset = parseInt(params.get('offset')) || 0;
+			let status = params.get('status');
+			const id = params.get('id');
+			
+			if (status && status.startsWith('eq.')) {
+				status = status.substring(3);
+			} else if (status && status.startsWith('neq.')) {
+				status = status.substring(4);
+			}
+			
+			if (id) {
+				const actualId = id.startsWith('eq.') ? id.substring(3) : id;
+				const email = mockDb.getEmails(1, 0).find(e => e.id == actualId);
+				return { status: 200, data: email ? [email] : [] };
+			} else if (lowerEndpoint.includes('select=count')) {
+				const count = mockDb.getEmailCount(status);
+				return { status: 200, data: [{ count }] };
+			} else {
+				const emails = mockDb.getEmails(limit, offset, status);
+				return { status: 200, data: emails };
+			}
+		} else if (method === 'POST') {
+			const newEmail = mockDb.addEmail(data);
+			return { status: 201, data: [newEmail] };
+		} else if (method === 'PATCH') {
+			const idMatch = endpoint.match(/id=eq\.([\d.]+)/);
+			if (idMatch) {
+				const id = idMatch[1];
+				const updated = mockDb.updateEmail(id, data);
+				return updated ? { status: 200, data: [updated] } : { status: 404, data: [] };
+			}
+			return { status: 400, data: [] };
+		}
+	}
+	
+	// Default mock response
+	return { status: 200, data: [] };
+}
+
 async function supabaseRequest(endpoint, method = 'GET', data = null) {
+	// Force mock mode if we detect connection issues
 	if (USE_MOCK) {
 		const lowerEndpoint = String(endpoint).toLowerCase();
 		console.log('Supabase request:', method, endpoint, 'lowerEndpoint:', lowerEndpoint);
@@ -274,10 +367,18 @@ async function supabaseRequest(endpoint, method = 'GET', data = null) {
 			method,
 			data,
 			headers: getHeaders(),
-			validateStatus: () => true
+			validateStatus: () => true,
+			timeout: 5000 // 5 second timeout
 		});
 		return { status: response.status, data: response.data };
 	} catch (error) {
+		console.error('Supabase connection error:', error.message);
+		// If it's a connection error, fall back to mock mode
+		if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+			console.log('Falling back to mock mode due to connection error');
+			// Force mock mode for this request
+			return await mockSupabaseRequest(endpoint, method, data);
+		}
 		return { status: 500, data: { error: error.message } };
 	}
 }
