@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { supabaseRequest } = require('../utils/supabase');
-const { authMiddleware } = require('../videos/middleware/auth');
+const { adminOnlyMiddleware } = require('../utils/adminAuth');
 const { sendEmail } = require('../utils/notifications');
 const path = require('path');
 const fs = require('fs');
@@ -23,8 +23,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// All routes here require Supabase auth
-router.use(authMiddleware);
+// All routes here require admin authentication
+router.use(adminOnlyMiddleware);
 
 // GET /api/admin/dashboard-stats
 router.get('/dashboard-stats', async (req, res) => {

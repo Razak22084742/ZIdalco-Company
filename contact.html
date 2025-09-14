@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <link rel="stylesheet" href="css/Style.css">
-    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="assets/css/chatbot.css">
+    <script src="assets/js/api-config.js"></script>
 <script src="assets/js/script.js"></script>
 
     <meta charset="UTF-8">
@@ -257,7 +258,7 @@
             
             try {
                 // 1) Save to backend for admin visibility
-                const savePromise = fetch('/api/emails/send', {
+                const savePromise = apiCall('/api/emails/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

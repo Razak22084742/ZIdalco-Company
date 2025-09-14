@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../utils/supabaseClient');
 const { authenticateUser, createUser } = require('../utils/userDatabase');
+const { loginRateLimiter, recordFailedAttempt, recordSuccessfulLogin } = require('../utils/rateLimiter');
 const axios = require('axios');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const USE_MOCK = String(process.env.SUPABASE_MOCK).toLowerCase() === 'true' || !SUPABASE_URL;
 
 // POST /api/auth/login using proper authentication
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -19,8 +20,13 @@ router.post('/login', async (req, res) => {
       // Use local user database for authentication
       const authResult = await authenticateUser(email, password);
       if (!authResult.success) {
+        // Record failed attempt
+        recordFailedAttempt(req.clientIP);
         return res.status(401).json({ error: true, message: authResult.message });
       }
+      
+      // Record successful login
+      recordSuccessfulLogin(req.clientIP);
       
       // Generate a simple token (in production, use JWT)
       const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
@@ -34,7 +40,11 @@ router.post('/login', async (req, res) => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return res.status(401).json({ error: true, message: error.message });
+      if (error) {
+        recordFailedAttempt(req.clientIP);
+        return res.status(401).json({ error: true, message: error.message });
+      }
+      recordSuccessfulLogin(req.clientIP);
       return res.json({ success: true, message: 'Login successful', token: data.session.access_token, admin: { id: data.user?.id, name: data.user?.user_metadata?.name, email } });
     } catch (e) {
       // Fallback to REST if fetch failed
@@ -44,14 +54,18 @@ router.post('/login', async (req, res) => {
           const resp = await axios.post(url, { email, password }, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } });
           if (resp.status >= 200 && resp.status < 300) {
             const d = resp.data;
+            recordSuccessfulLogin(req.clientIP);
             return res.json({ success: true, message: 'Login successful', token: d.access_token, admin: { id: d.user?.id, name: d.user?.user_metadata?.name, email } });
           }
+          recordFailedAttempt(req.clientIP);
           return res.status(401).json({ error: true, message: 'Invalid credentials' });
         } catch (restErr) {
           console.error('Login REST fallback error:', restErr?.response?.data || restErr?.message);
+          recordFailedAttempt(req.clientIP);
           return res.status(400).json({ error: true, message: 'Login failed' });
         }
       }
+      recordFailedAttempt(req.clientIP);
       throw e;
     }
   } catch (error) {
@@ -60,13 +74,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/signup - BLOCKED FOR SECURITY
+// POST /api/auth/signup - DISABLED FOR SECURITY
 router.post('/signup', async (req, res) => {
-  // Signup is completely blocked for security reasons
-  // Only one admin account is allowed
-  return res.status(403).json({ 
+  // Signup is disabled for security - only one admin account is allowed
+  res.status(403).json({ 
     error: true, 
-    message: 'Admin signup is disabled for security reasons. Only authorized personnel can access the admin portal.' 
+    message: 'Admin signup is disabled. Contact system administrator for access.' 
   });
 });
 
@@ -103,64 +116,6 @@ router.post('/forgot-password', async (req, res) => {
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: true, message: 'Failed to request password reset' });
-  }
-});
-
-// POST /api/auth/change-password - SECURE PASSWORD CHANGE
-router.post('/change-password', async (req, res) => {
-  try {
-    const { currentPassword, newPassword, confirmPassword } = req.body;
-    
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ error: true, message: 'All fields are required' });
-    }
-    
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ error: true, message: 'New passwords do not match' });
-    }
-    
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: true, message: 'New password must be at least 6 characters long' });
-    }
-    
-    if (currentPassword === newPassword) {
-      return res.status(400).json({ error: true, message: 'New password must be different from current password' });
-    }
-
-    if (USE_MOCK) {
-      // For mock mode, we need to verify the current password and update it
-      const { verifyPassword, hashPassword, findUserByEmail } = require('../utils/userDatabase');
-      
-      // Get the admin user (only one admin account allowed)
-      const adminUser = findUserByEmail('admin@zidalco.com');
-      if (!adminUser) {
-        return res.status(404).json({ error: true, message: 'Admin account not found' });
-      }
-      
-      // Verify current password
-      const isCurrentPasswordValid = await verifyPassword(currentPassword, adminUser.password);
-      if (!isCurrentPasswordValid) {
-        return res.status(401).json({ error: true, message: 'Current password is incorrect' });
-      }
-      
-      // Hash new password
-      const hashedNewPassword = await hashPassword(newPassword);
-      
-      // Update password in the user database
-      adminUser.password = hashedNewPassword;
-      
-      return res.json({ 
-        success: true, 
-        message: 'Password changed successfully. Please log in again with your new password.' 
-      });
-    }
-    
-    // For production with Supabase, this would require proper authentication
-    return res.status(501).json({ error: true, message: 'Password change not implemented for production mode' });
-    
-  } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({ error: true, message: 'Failed to change password' });
   }
 });
 

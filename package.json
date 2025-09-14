@@ -1,27 +1,35 @@
 {
-  "name": "zidalco-touchpoint",
+  "name": "zidalco-backend",
   "version": "1.0.0",
-  "description": "Zidalco Company Limited - Customer Touchpoint System",
-  "main": "api/index.js",
+  "description": "Zidalco Company Limited Backend API",
+  "main": "index.js",
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "node api/index.js",
-    "build": "echo 'Express app - no build step required'"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build": "echo 'No build step required'",
+    "vercel-build": "echo 'Vercel build completed'",
+    "prod": "NODE_ENV=production node index.js",
+    "docker:build": "docker build -t zidalco-api .",
+    "docker:run": "docker run -p 3000:3000 zidalco-api"
   },
+  "keywords": ["zidalco", "backend", "api", "vercel"],
+  "author": "Zidalco Team",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.6.0",
+    "nodemailer": "^6.9.7",
+    "@supabase/supabase-js": "^2.45.4",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": "22.x"
-  },
-  "keywords": [
-    "zidalco",
-    "construction",
-    "customer-feedback",
-    "admin-dashboard",
-    "express"
-  ],
-  "author": "Zidalco Company Limited",
-  "license": "MIT"
+    "node": ">=18.0.0"
+  }
 }

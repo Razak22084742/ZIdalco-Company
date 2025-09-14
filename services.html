@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Services - Zidalco Company Limited</title>
     <link rel="stylesheet" href="css/Style.css">
-    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="assets/css/chatbot.css">
+    <script src="assets/js/api-config.js"></script>
     <link rel="icon" type="image/png" href="Images/favicon.png">
 
     <!-- SEO Meta Tags -->
@@ -242,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
         try {
-            const response = await fetch('/api/contents?location=services');
+            const response = await apiCall('/api/contents?location=services');
             const data = await response.json();
             
             if (data.success && data.contents && data.contents.length > 0) {

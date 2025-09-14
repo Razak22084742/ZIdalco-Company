@@ -6,7 +6,8 @@
     <title>Zidalco Company Limited</title>
     <link rel="stylesheet" href="css/Style.css">
     <link rel="icon" type="image/jpeg" href="/Images/logo.jpg">
-    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="assets/css/chatbot.css">
+    <script src="assets/js/api-config.js"></script>
 
     <meta name="description" content="Zidalco Company Limited - Ghana's trusted construction partner delivering innovative and sustainable building solutions.">
     <meta name="keywords" content="Zidalco, Construction, Engineering, Ghana, Building, Civil Works">
@@ -395,7 +396,7 @@
     // Load admin announcements for home (fetches from backend API)
     document.addEventListener('DOMContentLoaded', async () => {
         try {
-            const response = await fetch('/api/contents?location=home&slot=announcement');
+            const response = await apiCall('/api/contents?location=home&slot=announcement');
             const data = await response.json();
             
             if (data.success && data.contents && data.contents.length > 0) {
@@ -439,7 +440,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (name && message) {
             try {
-                const response = await fetch('/api/feedback/submit', {
+                const response = await apiCall('/api/feedback/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -481,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // ✅ Load comments from backend
     async function loadCommentsFromBackend() {
         try {
-            const response = await fetch('/api/feedback?limit=50');
+            const response = await apiCall('/api/feedback?limit=50');
             const data = await response.json();
 
             if (data.success) {
