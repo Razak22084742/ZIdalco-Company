@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+    <script src="/assets/js/api-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .success { border-left-color: #28a745; background: #d4edda; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Zidalco Debug Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. API Configuration Test</h2>
+        <button onclick="testApiConfig()">Test API Config</button>
+        <div id="apiConfigResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Admin Login Test</h2>
+        <button onclick="testLogin()">Test Admin Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Feedback Submit Test</h2>
+        <button onclick="testFeedbackSubmit()">Test Feedback Submit</button>
+        <div id="feedbackSubmitResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Feedback Get Test</h2>
+        <button onclick="testFeedbackGet()">Test Get Feedback</button>
+        <div id="feedbackGetResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Email Send Test</h2>
+        <button onclick="testEmailSend()">Test Email Send</button>
+        <div id="emailSendResult" class="result"></div>
+    </div>
+
+    <script>
+        console.log('🔧 Debug page loaded');
+        console.log('API Base URL:', window.API_CONFIG?.baseUrl);
+        
+        function showResult(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre>${message}</pre>`;
+            element.className = `result ${isError ? 'error' : 'success'}`;
+        }
+        
+        function testApiConfig() {
+            const result = document.getElementById('apiConfigResult');
+            try {
+                const config = {
+                    baseUrl: window.API_CONFIG?.baseUrl,
+                    apiCall: typeof window.apiCall,
+                    hostname: window.location.hostname
+                };
+                showResult('apiConfigResult', JSON.stringify(config, null, 2));
+            } catch (error) {
+                showResult('apiConfigResult', `Error: ${error.message}`, true);
+            }
+        }
+        
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            result.innerHTML = 'Testing login...';
+            
+            try {
+                console.log('Testing login with:', window.API_CONFIG?.baseUrl);
+                const response = await apiCall('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@zidalco.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                console.log('Login response:', response);
+                const data = await response.json();
+                console.log('Login data:', data);
+                
+                if (data.success) {
+                    showResult('loginResult', `✅ Login successful!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult('loginResult', `❌ Login failed: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showResult('loginResult', `❌ Login error: ${error.message}`, true);
+            }
+        }
+        
+        async function testFeedbackSubmit() {
+            const result = document.getElementById('feedbackSubmitResult');
+            result.innerHTML = 'Testing feedback submit...';
+            
+            try {
+                const response = await apiCall('/api/feedback/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Debug Test User',
+                        email: 'debug@test.com',
+                        message: 'This is a debug test feedback message'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Feedback submit data:', data);
+                
+                if (data.success) {
+                    showResult('feedbackSubmitResult', `✅ Feedback submitted!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult('feedbackSubmitResult', `❌ Feedback submit failed: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('Feedback submit error:', error);
+                showResult('feedbackSubmitResult', `❌ Feedback submit error: ${error.message}`, true);
+            }
+        }
+        
+        async function testFeedbackGet() {
+            const result = document.getElementById('feedbackGetResult');
+            result.innerHTML = 'Testing get feedback...';
+            
+            try {
+                const response = await apiCall('/api/feedback');
+                const data = await response.json();
+                console.log('Feedback get data:', data);
+                
+                if (data.success) {
+                    showResult('feedbackGetResult', `✅ Feedback retrieved!\nCount: ${data.feedback?.length || 0}\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult('feedbackGetResult', `❌ Get feedback failed: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('Feedback get error:', error);
+                showResult('feedbackGetResult', `❌ Feedback get error: ${error.message}`, true);
+            }
+        }
+        
+        async function testEmailSend() {
+            const result = document.getElementById('emailSendResult');
+            result.innerHTML = 'Testing email send...';
+            
+            try {
+                const response = await apiCall('/api/emails/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Debug Test User',
+                        email: 'debug@test.com',
+                        phone: '1234567890',
+                        message: 'This is a debug test email',
+                        recipient_email: 'zidalcoltd@gmail.com'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Email send data:', data);
+                
+                if (data.success) {
+                    showResult('emailSendResult', `✅ Email sent!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult('emailSendResult', `❌ Email send failed: ${data.message}`, true);
+                }
+            } catch (error) {
+                console.error('Email send error:', error);
+                showResult('emailSendResult', `❌ Email send error: ${error.message}`, true);
+            }
+        }
+        
+        // Auto-run API config test on load
+        window.addEventListener('load', () => {
+            testApiConfig();
+        });
+    </script>
+</body>
+</html>

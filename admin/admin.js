@@ -220,7 +220,7 @@ class AdminDashboard {
     
     async loadDashboardData() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/admin/dashboard-stats', {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/dashboard-stats`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -253,7 +253,7 @@ class AdminDashboard {
     
     async loadRecentActivity() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/admin/notifications', {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/notifications`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -521,7 +521,7 @@ class AdminDashboard {
     async loadContentList() {
         console.log('loadContentList called');
         try {
-            const res = await fetch(`${this.apiBaseUrl}/api/admin/contents?limit=100', { 
+            const res = await fetch(`${this.apiBaseUrl}/api/admin/contents?limit=100`, { 
                 headers: { 'Authorization': `Bearer ${this.token}` } 
             });
             const data = await res.json();
@@ -651,7 +651,7 @@ class AdminDashboard {
                 console.log('Updating existing content with ID:', this.currentContentId);
             } else {
                 // Create new content
-                response = await fetch(`${this.apiBaseUrl}/api/admin/contents', {
+                response = await fetch(`${this.apiBaseUrl}/api/admin/contents`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -708,7 +708,7 @@ class AdminDashboard {
     
     async loadNotifications() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/admin/notifications', {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/notifications`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -787,7 +787,7 @@ class AdminDashboard {
         
         try {
             // Try to get feedback from the working /api/feedback endpoint first
-            const response = await fetch(`${this.apiBaseUrl}/api/feedback');
+            const response = await fetch(`${this.apiBaseUrl}/api/feedback`);
             const data = await response.json();
             
             if (data.success && data.feedback) {
@@ -830,7 +830,7 @@ class AdminDashboard {
     async replyToEmail(emailId) {
         // Get email details and show reply modal
         try {
-            const response = await fetch(`/api/admin/emails/${emailId}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/emails/${emailId}`, {
                 headers: {
                     'Authorization': `Bearer ${this.token}`
                 }
@@ -924,7 +924,7 @@ class AdminDashboard {
                 };
 
                 // Save email reply
-                const response = await fetch(`${this.apiBaseUrl}/api/emails/reply', {
+                const response = await fetch(`${this.apiBaseUrl}/api/emails/reply`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -956,7 +956,7 @@ class AdminDashboard {
                 };
 
                 // Save reply to mock database
-                const response = await fetch(`${this.apiBaseUrl}/api/feedback/reply', {
+                const response = await fetch(`${this.apiBaseUrl}/api/feedback/reply`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -988,7 +988,7 @@ class AdminDashboard {
 
     async updateEmailStatus(emailId, status) {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/emails/status', {
+            const response = await fetch(`${this.apiBaseUrl}/api/emails/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1010,7 +1010,7 @@ class AdminDashboard {
 
     async updateFeedbackStatus(feedbackId, status) {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/feedback/status', {
+            const response = await fetch(`${this.apiBaseUrl}/api/feedback/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1035,7 +1035,7 @@ class AdminDashboard {
 
         // Fetch the latest details to know recipient
         if (this.currentReplyType === 'email') {
-            const res = await fetch(`/api/admin/emails/${this.currentReplyId}`, { headers: { 'Authorization': `Bearer ${this.token}` } });
+            const res = await fetch(`${this.apiBaseUrl}/api/admin/emails/${this.currentReplyId}`, { headers: { 'Authorization': `Bearer ${this.token}` } });
             const data = await res.json();
             const email = data && (data.email || data.emails);
             if (!email) throw new Error('Email details not found');
@@ -1054,7 +1054,7 @@ class AdminDashboard {
         }
 
         if (this.currentReplyType === 'feedback') {
-            const res = await fetch(`/api/admin/feedback/${this.currentReplyId}`, { headers: { 'Authorization': `Bearer ${this.token}` } });
+            const res = await fetch(`${this.apiBaseUrl}/api/admin/feedback/${this.currentReplyId}`, { headers: { 'Authorization': `Bearer ${this.token}` } });
             const data = await res.json();
             const fb = data && data.feedback;
             if (!fb || !fb.email) throw new Error('Feedback details not found');
@@ -1076,7 +1076,7 @@ class AdminDashboard {
     
     async markAsRead(type, id) {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/admin/mark-read', {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/mark-read`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1097,7 +1097,7 @@ class AdminDashboard {
     
     async markAllAsRead() {
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/admin/mark-all-read', {
+            const response = await fetch(`${this.apiBaseUrl}/api/admin/mark-all-read`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`
@@ -1236,7 +1236,7 @@ class AdminDashboard {
         const email = (document.getElementById('loginEmail')?.value || '').trim();
         if (!email) { this.showError('Enter your email to reset password'); return; }
         try {
-            const res = await fetch(`${this.apiBaseUrl}/api/auth/forgot-password', {
+            const res = await fetch(`${this.apiBaseUrl}/api/auth/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+    <script src="/assets/js/api-config.js"></script>
+</head>
+<body>
+    <h1>Debug Test Page</h1>
+    
+    <h2>1. Test Login</h2>
+    <button onclick="testLogin()">Test Admin Login</button>
+    <div id="loginResult"></div>
+    
+    <h2>2. Test Feedback Submit</h2>
+    <button onclick="testFeedback()">Test Feedback Submit</button>
+    <div id="feedbackResult"></div>
+    
+    <h2>3. Test Feedback Get</h2>
+    <button onclick="testGetFeedback()">Test Get Feedback</button>
+    <div id="getFeedbackResult"></div>
+    
+    <h2>4. Test Email Send</h2>
+    <button onclick="testEmail()">Test Email Send</button>
+    <div id="emailResult"></div>
+
+    <script>
+        console.log('API Base URL:', window.API_CONFIG.baseUrl);
+        
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await apiCall('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@zidalco.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testFeedback() {
+            const result = document.getElementById('feedbackResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await apiCall('/api/feedback/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Debug Test',
+                        email: 'debug@test.com',
+                        message: 'This is a debug test message'
+                    })
+                });
+                
+                const data = await response.json();
+                result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testGetFeedback() {
+            const result = document.getElementById('getFeedbackResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await apiCall('/api/feedback');
+                const data = await response.json();
+                result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testEmail() {
+            const result = document.getElementById('emailResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await apiCall('/api/emails/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Debug Test',
+                        email: 'debug@test.com',
+                        phone: '1234567890',
+                        message: 'This is a debug test email',
+                        recipient_email: 'zidalcoltd@gmail.com'
+                    })
+                });
+                
+                const data = await response.json();
+                result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                result.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
