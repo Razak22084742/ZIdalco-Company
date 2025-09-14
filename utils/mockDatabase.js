@@ -64,6 +64,10 @@ function getFeedback(limit = 50, offset = 0, status = null) {
     if (status === 'neq.deleted') {
       // Exclude deleted items
       filtered = feedbackData.filter(item => item.status !== 'deleted');
+    } else if (status.startsWith('neq.')) {
+      // Handle other neq. prefixes
+      const excludeStatus = status.substring(4);
+      filtered = feedbackData.filter(item => item.status !== excludeStatus);
     } else {
       filtered = feedbackData.filter(item => item.status === status);
     }
@@ -75,7 +79,12 @@ function getFeedback(limit = 50, offset = 0, status = null) {
   
   // Only return actual feedback items, not replies
   // Filter out items that have feedback_id (replies) or reply_message (replies)
-  filtered = filtered.filter(item => !item.feedback_id && !item.reply_message);
+  // But only if those fields actually exist and have values
+  filtered = filtered.filter(item => {
+    // Keep items that don't have feedback_id or reply_message fields
+    // OR items where those fields are null/undefined/empty
+    return !item.feedback_id && !item.reply_message;
+  });
   
   console.log('Final filtered result:', filtered);
   

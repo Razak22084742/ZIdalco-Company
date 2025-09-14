@@ -47,11 +47,8 @@ async function mockSupabaseRequest(endpoint, method = 'GET', data = null) {
 			let status = params.get('status');
 			const id = params.get('id');
 			
-			if (status && status.startsWith('eq.')) {
-				status = status.substring(3);
-			} else if (status && status.startsWith('neq.')) {
-				status = status.substring(4);
-			}
+			// Don't parse status here - let the mock function handle it
+			// The mock function will handle eq. and neq. prefixes
 			
 			if (id) {
 				const actualId = id.startsWith('eq.') ? id.substring(3) : id;
@@ -89,11 +86,8 @@ async function mockSupabaseRequest(endpoint, method = 'GET', data = null) {
 			let status = params.get('status');
 			const id = params.get('id');
 			
-			if (status && status.startsWith('eq.')) {
-				status = status.substring(3);
-			} else if (status && status.startsWith('neq.')) {
-				status = status.substring(4);
-			}
+			// Don't parse status here - let the mock function handle it
+			// The mock function will handle eq. and neq. prefixes
 			
 			if (id) {
 				const actualId = id.startsWith('eq.') ? id.substring(3) : id;
@@ -142,12 +136,11 @@ async function supabaseRequest(endpoint, method = 'GET', data = null) {
 				let status = params.get('status');
 				const id = params.get('id');
 				
-				// Handle eq. and neq. prefixes for status (e.g., status=eq.replied, status=neq.deleted)
-				if (status && status.startsWith('eq.')) {
-					status = status.substring(3);
-				} else if (status && status.startsWith('neq.')) {
-					status = status.substring(4);
-				}
+				console.log('Raw status from URL:', status);
+				console.log('Status type:', typeof status);
+				
+				// Don't parse status here - let the mock function handle it
+				// The mock function will handle eq. and neq. prefixes
 				
 				if (id) {
 					// Get specific feedback by ID
