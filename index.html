@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     data.feedback.map(async (item) => {
                         // Load replies for this feedback
                         try {
-                            const replyResponse = await fetch(`/api/feedback/${item.id}`);
+                            const replyResponse = await apiCall(`/api/feedback/${item.id}`);
                             const replyData = await replyResponse.json();
                             console.log('Reply data for feedback', item.id, ':', replyData);
                             const replies = replyData.success && replyData.feedback.replies ? replyData.feedback.replies : [];
