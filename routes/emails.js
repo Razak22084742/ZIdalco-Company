@@ -42,21 +42,37 @@ router.post('/send', async (req, res) => {
 
     if (result.status >= 200 && result.status < 300) {
       // Try to send actual email (but don't fail the request if this fails)
+      let emailSent = false;
+      let notificationRecorded = false;
+      
       try {
-        await sendEmail(emailData);
-        await sendAdminNotification('email', emailData);
+        const emailResult = await sendEmail(emailData);
+        emailSent = emailResult.success;
+        
+        const notificationResult = await sendAdminNotification('email', emailData);
+        notificationRecorded = notificationResult.success;
         
         // Update status to sent if email was sent successfully
-        await supabaseRequest(`emails?id=eq.${result.data[0].id}`, 'PATCH', { status: 'sent' });
+        if (emailSent) {
+          await supabaseRequest(`emails?id=eq.${result.data[0].id}`, 'PATCH', { status: 'sent' });
+        }
       } catch (emailError) {
         console.warn('Email sending failed, but record saved:', emailError.message);
         // Keep status as 'sent' since the record was saved successfully
         // The frontend EmailJS will handle the actual email delivery
       }
 
+      let message = 'Email recorded successfully!';
+      if (!emailSent) {
+        message += ' (Email sending failed, but admin will see it)';
+      }
+      if (!notificationRecorded) {
+        message += ' (Admin notification failed, but admin may not see it)';
+      }
+
       res.json({
         success: true,
-        message: 'Email recorded successfully!',
+        message: message,
         data: emailData
       });
     } else {

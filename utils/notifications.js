@@ -51,8 +51,32 @@ async function sendEmail(emailData) {
 }
 
 async function sendAdminNotification(type, payload) {
-  // Placeholder: in production you might push to a queue or use email/slack, etc.
-  console.log('Admin notification:', { type, payload });
+  // Record admin notification in the database for admin dashboard
+  try {
+    const { supabaseRequest } = require('./supabase');
+    
+    const notificationData = {
+      type: type,
+      payload: payload,
+      is_read: false,
+      created_at: new Date().toISOString()
+    };
+    
+    // Store in admin_notifications table (or feedback/emails table with notification flag)
+    const result = await supabaseRequest('admin_notifications', 'POST', notificationData);
+    
+    if (result.status === 200 || result.status === 201) {
+      console.log('Admin notification recorded successfully:', { type, payload });
+      return { success: true };
+    } else {
+      console.log('Admin notification (fallback logging):', { type, payload });
+      return { success: false, fallback: true };
+    }
+  } catch (error) {
+    console.error('Failed to record admin notification:', error);
+    console.log('Admin notification (fallback logging):', { type, payload });
+    return { success: false, fallback: true, error: error.message };
+  }
 }
 
 async function sendReplyNotification(replyData) {

@@ -36,11 +36,16 @@ router.post('/submit', async (req, res) => {
 
     if (result.status >= 200 && result.status < 300) {
       // Send admin notification
-      await sendAdminNotification('feedback', feedbackData);
+      const notificationResult = await sendAdminNotification('feedback', feedbackData);
+      
+      let message = 'Feedback submitted successfully!';
+      if (!notificationResult.success) {
+        message += ' (Admin notification failed, but admin may not see it)';
+      }
 
       res.json({
         success: true,
-        message: 'Feedback submitted successfully!',
+        message: message,
         data: feedbackData
       });
     } else {
