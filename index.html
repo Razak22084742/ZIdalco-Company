@@ -423,6 +423,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const commentCount = document.getElementById("commentCount");
     const charCount = document.getElementById("charCount");
 
+    console.log('DOM loaded, elements found:', {
+        feedbackForm: !!feedbackForm,
+        commentsList: !!commentsList,
+        commentCount: !!commentCount,
+        charCount: !!charCount
+    });
+
+    if (!feedbackForm) {
+        console.error('Feedback form not found!');
+        return;
+    }
+
     // Load comments from backend
     let comments = [];
     loadCommentsFromBackend();
@@ -439,6 +451,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const name = feedbackForm.name.value.trim();
         const message = feedbackForm.message.value.trim();
         console.log('Name:', name, 'Message:', message);
+        console.log('API Config:', window.API_CONFIG);
+        console.log('apiCall function:', typeof window.apiCall);
 
         if (name && message) {
             try {
@@ -455,6 +469,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
 
                 console.log('API response received:', response);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
                 const data = await response.json();
                 console.log('Response data:', data);
                 
@@ -479,6 +495,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             } catch (error) {
                 console.error('Error submitting feedback:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
                 showMessage('Failed to submit feedback. Please try again.', 'error');
             }
         }
