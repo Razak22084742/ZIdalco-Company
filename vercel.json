@@ -6,46 +6,23 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/admin",
-      "dest": "/admin/index.html"
+      "source": "/admin",
+      "destination": "/admin/index.html"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "/admin/$1"
+      "source": "/admin/(.*)",
+      "destination": "/admin/$1"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "/css/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/Images/(.*)",
-      "dest": "/Images/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
-    },
-    {
-      "src": "/(.*\\.(html|css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|mp4))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "https://api.mysite.com"
-  },
   "headers": [
     {
-      "source": "/(.*\\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot))",
+      "source": "/(.*\\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|mp4))",
       "headers": [
         {
           "key": "Cache-Control",
@@ -53,5 +30,8 @@
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.mysite.com"
+  }
 }
