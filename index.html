@@ -435,11 +435,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // ✅ Handle form submit
     feedbackForm.addEventListener("submit", async function(e) {
         e.preventDefault();
+        console.log('Form submitted!');
         const name = feedbackForm.name.value.trim();
         const message = feedbackForm.message.value.trim();
+        console.log('Name:', name, 'Message:', message);
 
         if (name && message) {
             try {
+                console.log('Making API call...');
                 const response = await apiCall('/api/feedback/submit', {
                     method: 'POST',
                     headers: {
@@ -451,7 +454,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     })
                 });
 
+                console.log('API response received:', response);
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (data.success) {
                     // Add to local comments for immediate display
