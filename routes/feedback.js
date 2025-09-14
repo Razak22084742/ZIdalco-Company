@@ -40,7 +40,7 @@ router.post('/submit', async (req, res) => {
       
       let message = 'Feedback submitted successfully!';
       if (!notificationResult.success) {
-        message += ' (Admin notification failed, but admin may not see it)';
+        message += ' (Admin notification delayed, but feedback is recorded)';
       }
 
       res.json({

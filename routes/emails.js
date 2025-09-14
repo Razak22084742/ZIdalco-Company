@@ -62,12 +62,12 @@ router.post('/send', async (req, res) => {
         // The frontend EmailJS will handle the actual email delivery
       }
 
-      let message = 'Email recorded successfully!';
+      let message = 'Message sent successfully!';
       if (!emailSent) {
-        message += ' (Email sending failed, but admin will see it)';
+        message += ' (Email delivery may be delayed, but admin will see it)';
       }
       if (!notificationRecorded) {
-        message += ' (Admin notification failed, but admin may not see it)';
+        message += ' (Admin notification delayed, but message is recorded)';
       }
 
       res.json({

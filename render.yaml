@@ -14,4 +14,14 @@ services:
         value: false
       - key: ALLOWED_ORIGINS
         value: https://www.mysite.com,https://mysite.com,https://zidalco.vercel.app
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        value: zidalcoltd@gmail.com
+      - key: JWT_SECRET
+        value: zidalco_jwt_secret_key_2024
+      - key: BCRYPT_ROUNDS
+        value: 12
     healthCheckPath: /api/health

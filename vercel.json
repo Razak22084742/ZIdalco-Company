@@ -59,6 +59,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://api.mysite.com"
+    "NEXT_PUBLIC_API_URL": "https://zidalco-api-5nf2.onrender.com"
   }
 }

@@ -10,7 +10,7 @@ class AdminDashboard {
         // API URL configuration for production
         this.apiBaseUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
-            : 'https://zidalco-api-5nf2.onrender.com';  // Your actual Render URL
+            : (window.NEXT_PUBLIC_API_URL || 'https://zidalco-api-5nf2.onrender.com');
         
         this.init();
     }
@@ -446,10 +446,15 @@ class AdminDashboard {
             const data = await response.json();
             
             if (data.success) {
+                console.log('Loaded emails from admin API:', data.emails);
                 this.displayEmails(data.emails);
+            } else {
+                console.error('Failed to load emails:', data.message);
+                this.showError(data.message || 'Failed to load emails');
             }
         } catch (error) {
             console.error('Failed to load emails:', error);
+            this.showError('Failed to load emails. Please try again.');
         }
     }
     
