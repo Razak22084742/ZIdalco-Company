@@ -12,4 +12,6 @@ services:
         value: 3000
       - key: SUPABASE_MOCK
         value: false
+      - key: ALLOWED_ORIGINS
+        value: https://www.mysite.com,https://mysite.com,https://zidalco.vercel.app
     healthCheckPath: /api/health
