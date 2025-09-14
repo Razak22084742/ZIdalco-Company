@@ -7,7 +7,7 @@
 ## 📋 Prerequisites
 1. Domain name (e.g., `mysite.com`)
 2. Vercel account
-3. Render or Railway account
+3. Render or Railway account            
 4. Supabase account (for database)
 5. Email service (Gmail/SendGrid)
 

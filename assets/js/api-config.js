@@ -2,7 +2,7 @@
 window.API_CONFIG = {
     baseUrl: window.location.hostname === 'localhost' 
         ? 'http://localhost:3000' 
-        : 'https://api.mysite.com'
+        : 'https://zidalco-api.onrender.com'  // Updated to actual Render URL
 };
 
 // Helper function to make API calls

@@ -49,9 +49,11 @@ async function supabaseRequest(endpoint, method = 'GET', data = null) {
 				let status = params.get('status');
 				const id = params.get('id');
 				
-				// Handle eq. prefix for status (e.g., status=eq.replied)
+				// Handle eq. and neq. prefixes for status (e.g., status=eq.replied, status=neq.deleted)
 				if (status && status.startsWith('eq.')) {
 					status = status.substring(3);
+				} else if (status && status.startsWith('neq.')) {
+					status = status.substring(4);
 				}
 				
 				if (id) {
