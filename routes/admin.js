@@ -187,12 +187,12 @@ router.post('/reply-email', async (req, res) => {
 
     await supabaseRequest(`emails?id=eq.${email_id}`, 'PATCH', { status: 'replied' });
 
-    // Optional: actually send email reply using SMTP here (to sender_email)
+    // Send actual email to the sender via SMTP
     const emailData = emailRes.data[0];
     try {
       await sendEmail({
         sender_name: 'Zidalco Admin',
-        sender_email: process.env.SMTP_FROM || 'no-reply@zidalco.com',
+        sender_email: process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@zidalco.com',
         sender_phone: '',
         message: reply_message,
         recipient_email: emailData.sender_email

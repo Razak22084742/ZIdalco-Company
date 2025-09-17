@@ -208,8 +208,9 @@
     <section id="admin-announcement" class="services" style="display:none;">
         <h2 id="announcement-title"></h2>
         <p id="announcement-body"></p>
-        <div id="announcement-image-wrapper" style="margin-top:12px;">
+        <div id="announcement-image-wrapper" style="margin-top:12px; position:relative;">
             <img id="announcement-image" style="max-width:100%;width:100%;height:auto;border-radius:12px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.1);object-fit:cover;" />
+            <div id="announcement-slideshow" style="display:none; position:relative; overflow:hidden; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
         </div>
     </section>
 <!-- ✅ Picture Animation Section -->
@@ -407,9 +408,30 @@
                 document.getElementById('announcement-title').textContent = c.title || 'Announcement';
                 document.getElementById('announcement-body').textContent = c.body || '';
                 if (c.image_url) {
-                    const img = document.getElementById('announcement-image');
-                    img.src = c.image_url; 
-                    img.style.display = 'block';
+                    const raw = (c.image_url||'').trim();
+                    const slideEl = document.getElementById('announcement-slideshow');
+                    const singleImg = document.getElementById('announcement-image');
+                    try {
+                        let urls = [];
+                        if (raw.startsWith('[')) urls = JSON.parse(raw);
+                        else if (raw.includes(',')) urls = raw.split(',').map(s=>s.trim()).filter(Boolean);
+                        if (urls.length > 1) {
+                            slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" style="position:absolute;top:0;left:0;width:100%;height:auto;display:${i===0?'block':'none'};object-fit:cover;">`).join('');
+                            slideEl.style.display = 'block';
+                            let idx = 0;
+                            setInterval(()=>{
+                                const imgs = slideEl.querySelectorAll('img');
+                                imgs.forEach((img,i)=>{ img.style.display = i===idx? 'block':'none'; });
+                                idx = (idx + 1) % imgs.length;
+                            }, 3000);
+                        } else {
+                            singleImg.src = urls[0] || raw; 
+                            singleImg.style.display = 'block';
+                        }
+                    } catch(_) {
+                        singleImg.src = raw; 
+                        singleImg.style.display = 'block';
+                    }
                 }
                 sec.style.display = 'block';
             }
