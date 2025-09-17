@@ -13,10 +13,6 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001', 
-      'https://www.mysite.com',
-      'https://mysite.com',
       'https://zidalco.vercel.app', // Vercel preview URLs
       /^https:\/\/.*\.vercel\.app$/ // All Vercel preview URLs
     ];
