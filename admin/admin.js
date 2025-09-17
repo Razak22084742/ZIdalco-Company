@@ -32,12 +32,15 @@ class AdminDashboard {
             this.handleLogin();
         });
         
+        // No signup form (disabled)
         
 
         // Password visibility toggles
         const toggleLoginBtn = document.getElementById('toggleLoginPassword');
         if (toggleLoginBtn) toggleLoginBtn.addEventListener('click', () => this.togglePasswordVisibility('loginPassword', 'toggleLoginPassword'));
-        // Tabs switching (login only)
+        // No signup password toggle
+
+        // Tabs switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => this.switchAuthTab('login'));
         });
