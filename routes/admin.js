@@ -458,7 +458,11 @@ router.post('/contents/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: true, message: 'No file uploaded' });
     const relPath = `/uploads/${req.file.filename}`;
-    return res.json({ success: true, url: relPath });
+    // Build absolute URL so frontend (different domain) can load the image
+    const protocol = (req.headers['x-forwarded-proto'] || req.protocol || 'https');
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const absoluteUrl = `${protocol}://${host}${relPath}`;
+    return res.json({ success: true, url: absoluteUrl });
   } catch (error) {
     console.error('Upload content image error:', error);
     res.status(500).json({ error: true, message: 'Failed to upload image' });
