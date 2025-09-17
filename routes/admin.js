@@ -108,6 +108,7 @@ router.get('/notifications', async (req, res) => {
 router.post('/reply-feedback', async (req, res) => {
   try {
     const { feedback_id, reply_message } = req.body;
+    console.log('Reply feedback request:', { feedback_id, reply_message, user: req.user });
     if (!feedback_id || !reply_message) {
       return res.status(400).json({ error: true, message: 'Feedback ID and reply message are required' });
     }
@@ -125,9 +126,11 @@ router.post('/reply-feedback', async (req, res) => {
       created_at: new Date().toISOString()
     };
 
+    console.log('Saving reply data:', replyData);
     const save = await supabaseRequest('feedback_replies', 'POST', replyData);
+    console.log('Save result:', save);
     if (save.status < 200 || save.status >= 300) {
-      return res.status(500).json({ error: true, message: 'Failed to save reply' });
+      return res.status(500).json({ error: true, message: 'Failed to save reply', details: save.data });
     }
 
     // Update feedback status to replied and mark as read
@@ -405,13 +408,16 @@ router.post('/contents', async (req, res) => {
   try {
     const { location, slot } = req.body || {};
     let { title, body, image_url, is_published = true } = req.body || {};
+    console.log('Content creation request:', { location, slot, title, body, image_url, is_published, user: req.user });
     if (!location || !slot) return res.status(400).json({ error: true, message: 'location and slot are required' });
     // Coerce potential non-string inputs into strings
     if (title != null && typeof title !== 'string') title = JSON.stringify(title);
     if (body != null && typeof body !== 'string') body = JSON.stringify(body);
     if (image_url != null && typeof image_url !== 'string') image_url = String(image_url);
     const payload = { location, slot, title: title || null, body: body || null, image_url: image_url || null, is_published: Boolean(is_published) };
+    console.log('Content payload:', payload);
     const result = await supabaseRequest('contents', 'POST', payload);
+    console.log('Content creation result:', result);
     if (result.status >= 200 && result.status < 300) return res.json({ success: true, content: result.data?.[0] || payload });
     return res.status(500).json({ error: true, message: 'Failed to create content', details: result.data });
   } catch (error) {
