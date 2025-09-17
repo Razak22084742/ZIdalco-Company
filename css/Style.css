@@ -1106,6 +1106,7 @@ img {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     object-fit: cover;
+    border: 2px solid #ff0000; /* Debug: red border to see if image is there */
 }
 
 #announcement-slideshow {
@@ -1117,6 +1118,7 @@ img {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
+    border: 2px solid #00ff00; /* Debug: green border to see if slideshow is there */
 }
 
 #announcement-slideshow img {

@@ -401,25 +401,38 @@
     // Load admin announcements for home (fetches from backend API)
     document.addEventListener('DOMContentLoaded', async () => {
         try {
+            console.log('Loading admin announcements...');
             const response = await apiCall('/api/contents?location=home&slot=announcement');
             const data = await response.json();
+            console.log('API Response:', data);
             
             if (data.success && data.contents && data.contents.length > 0) {
                 const c = data.contents[0];
+                console.log('Content data:', c);
                 const sec = document.getElementById('admin-announcement');
                 document.getElementById('announcement-title').textContent = c.title || 'Announcement';
                 document.getElementById('announcement-body').textContent = c.body || '';
+                
                 if (c.image_url) {
+                    console.log('Image URL found:', c.image_url);
                     const raw = (c.image_url||'').trim();
                     const slideEl = document.getElementById('announcement-slideshow');
                     const singleImg = document.getElementById('announcement-image');
                     try {
                         let urls = [];
-                        if (raw.startsWith('[')) urls = JSON.parse(raw);
-                        else if (raw.includes(',')) urls = raw.split(',').map(s=>s.trim()).filter(Boolean);
-                        else if (raw) urls = [raw]; // Single image
+                        if (raw.startsWith('[')) {
+                            urls = JSON.parse(raw);
+                            console.log('Parsed JSON URLs:', urls);
+                        } else if (raw.includes(',')) {
+                            urls = raw.split(',').map(s=>s.trim()).filter(Boolean);
+                            console.log('Parsed comma-separated URLs:', urls);
+                        } else if (raw) {
+                            urls = [raw]; // Single image
+                            console.log('Single URL:', urls);
+                        }
                         
                         if (urls.length > 1) {
+                            console.log('Creating slideshow with', urls.length, 'images');
                             // Multiple images - create slideshow
                             slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" style="position:absolute;top:0;left:0;width:100%;height:100%;display:${i===0?'block':'none'};object-fit:cover;border-radius:12px;">`).join('');
                             slideEl.style.display = 'block';
@@ -435,6 +448,7 @@
                                 idx = (idx + 1) % imgs.length;
                             }, 3000);
                         } else if (urls.length === 1) {
+                            console.log('Displaying single image:', urls[0]);
                             // Single image
                             singleImg.src = urls[0]; 
                             singleImg.style.display = 'block';
@@ -442,13 +456,19 @@
                         }
                     } catch(error) {
                         console.error('Error parsing image URLs:', error);
+                        console.log('Fallback to raw URL:', raw);
                         // Fallback to single image
                         singleImg.src = raw; 
                         singleImg.style.display = 'block';
                         slideEl.style.display = 'none';
                     }
+                } else {
+                    console.log('No image URL found');
                 }
                 sec.style.display = 'block';
+                console.log('Admin announcement section displayed');
+            } else {
+                console.log('No admin announcements found');
             }
         } catch (error) {
             console.error('Failed to load admin announcements:', error);
