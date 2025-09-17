@@ -513,6 +513,14 @@
                 }
                 sec.style.display = 'block';
                 console.log('Admin announcement section displayed');
+                console.log('Section position and dimensions:', {
+                    display: sec.style.display,
+                    position: window.getComputedStyle(sec).position,
+                    top: window.getComputedStyle(sec).top,
+                    left: window.getComputedStyle(sec).left,
+                    width: sec.offsetWidth,
+                    height: sec.offsetHeight
+                });
             } else {
                 console.log('No admin announcements found');
             }

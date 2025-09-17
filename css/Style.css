@@ -1090,6 +1090,10 @@ img {
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 5%;
+    position: relative; /* Ensure proper positioning context */
+    z-index: 10; /* Ensure it's above other elements */
+    background: #fff; /* Ensure it has a background */
+    border: 3px solid #ff0000; /* Debug: red border to see the entire section */
 }
 
 #announcement-image-wrapper {
@@ -1117,10 +1121,11 @@ img {
     height: 200px; /* Fixed height for slideshow */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    position: relative;
+    position: relative; /* Relative to its parent container */
     overflow: hidden;
     border: 2px solid #00ff00; /* Debug: green border to see if slideshow is there */
     background-color: #f0f0f0; /* Debug: light background to see container */
+    margin: 0 auto; /* Center the slideshow */
 }
 
 #announcement-slideshow img {
