@@ -79,9 +79,9 @@
         <div class="container">
             <h2 id="content-title"></h2>
             <p id="content-body"></p>
-            <div id="content-image-wrapper" style="margin-top:12px; position:relative;">
-                <img id="content-image" style="max-width:100%;width:100%;height:auto;border-radius:12px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.1);object-fit:cover;" />
-                <div id="content-slideshow" style="display:none; position:relative; overflow:hidden; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+            <div id="content-image-wrapper">
+                <img id="content-image" style="display:none;" />
+                <div id="content-slideshow" style="display:none;"></div>
             </div>
         </div>
     </section>
@@ -353,41 +353,93 @@ document.addEventListener("DOMContentLoaded", () => {
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
         try {
+            console.log('Loading admin content for portfolio...');
             const response = await apiCall('/api/contents?location=portfolio');
             const data = await response.json();
+            console.log('Portfolio API Response:', data);
             
             if (data.success && data.contents && data.contents.length > 0) {
                 const c = data.contents[0];
+                console.log('Portfolio content data:', c);
                 const sec = document.getElementById('admin-content');
                 document.getElementById('content-title').textContent = c.title || 'Portfolio Update';
                 document.getElementById('content-body').textContent = c.body || '';
+                
                 if (c.image_url) {
+                    console.log('Portfolio image URL found:', c.image_url);
                     const raw = (c.image_url||'').trim();
                     const slideEl = document.getElementById('content-slideshow');
                     const singleImg = document.getElementById('content-image');
+                    
+                    // Clear any existing slideshow interval
+                    if (slideEl.dataset.intervalId) {
+                        clearInterval(parseInt(slideEl.dataset.intervalId));
+                        slideEl.dataset.intervalId = '';
+                    }
                     try {
                         let urls = [];
-                        if (raw.startsWith('[')) urls = JSON.parse(raw);
-                        else if (raw.includes(',')) urls = raw.split(',').map(s=>s.trim()).filter(Boolean);
+                        if (raw.startsWith('[')) {
+                            urls = JSON.parse(raw);
+                            console.log('Parsed JSON URLs:', urls);
+                        } else if (raw.includes(',')) {
+                            urls = raw.split(',').map(s=>s.trim()).filter(Boolean);
+                            console.log('Parsed comma-separated URLs:', urls);
+                        } else if (raw) {
+                            urls = [raw]; // Single image
+                            console.log('Single URL:', urls);
+                        }
+                        
                         if (urls.length > 1) {
-                            slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" style=\"position:absolute;top:0;left:0;width:100%;height:auto;display:${i===0?'block':'none'};object-fit:cover;\">`).join('');
+                            console.log('Creating portfolio slideshow with', urls.length, 'images');
+                            console.log('URLs for slideshow:', urls);
+                            
+                            // Multiple images - create slideshow
+                            slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" class="${i===0?'active':''}" alt="Slideshow image ${i+1}">`).join('');
                             slideEl.style.display = 'block';
+                            singleImg.style.display = 'none';
+                            
+                            console.log('Portfolio slideshow HTML created:', slideEl.innerHTML);
+                            console.log('Portfolio slideshow container dimensions:', {
+                                width: slideEl.offsetWidth,
+                                height: slideEl.offsetHeight,
+                                display: slideEl.style.display
+                            });
+                            
+                            // Auto-rotate slideshow
                             let idx = 0;
-                            setInterval(()=>{
+                            const slideshowInterval = setInterval(()=>{
                                 const imgs = slideEl.querySelectorAll('img');
-                                imgs.forEach((img,i)=>{ img.style.display = i===idx? 'block':'none'; });
+                                console.log('Portfolio slideshow rotation - current index:', idx, 'total images:', imgs.length);
+                                imgs.forEach((img,i)=>{ 
+                                    img.classList.toggle('active', i === idx);
+                                });
                                 idx = (idx + 1) % imgs.length;
                             }, 3000);
-                        } else {
-                            singleImg.src = urls[0] || raw; 
+                            
+                            // Store interval ID for potential cleanup
+                            slideEl.dataset.intervalId = slideshowInterval;
+                        } else if (urls.length === 1) {
+                            console.log('Displaying single portfolio image:', urls[0]);
+                            // Single image
+                            singleImg.src = urls[0]; 
                             singleImg.style.display = 'block';
+                            slideEl.style.display = 'none';
                         }
-                    } catch(_) {
+                    } catch(error) {
+                        console.error('Error parsing portfolio image URLs:', error);
+                        console.log('Fallback to raw URL:', raw);
+                        // Fallback to single image
                         singleImg.src = raw; 
                         singleImg.style.display = 'block';
+                        slideEl.style.display = 'none';
                     }
+                } else {
+                    console.log('No portfolio image URL found');
                 }
                 sec.style.display = 'block';
+                console.log('Portfolio admin content section displayed');
+            } else {
+                console.log('No portfolio admin content found');
             }
         } catch (error) {
             console.error('Failed to load admin content for portfolio:', error);

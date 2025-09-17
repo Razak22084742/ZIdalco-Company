@@ -1090,10 +1090,6 @@ img {
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 5%;
-    position: relative; /* Ensure proper positioning context */
-    z-index: 10; /* Ensure it's above other elements */
-    background: #fff; /* Ensure it has a background */
-    border: 3px solid #ff0000; /* Debug: red border to see the entire section */
 }
 
 #announcement-image-wrapper {
@@ -1110,7 +1106,7 @@ img {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     object-fit: cover;
-    border: 2px solid #ff0000; /* Debug: red border to see if image is there */
+    border: 2px solid #cccccc; /* Debug: grey border to see if image is there */
 }
 
 #announcement-slideshow {
@@ -1121,83 +1117,155 @@ img {
     height: 200px; /* Fixed height for slideshow */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    position: relative; /* Relative to its parent container */
+    position: relative;
     overflow: hidden;
     border: 2px solid #00ff00; /* Debug: green border to see if slideshow is there */
     background-color: #f0f0f0; /* Debug: light background to see container */
-    margin: 0 auto; /* Center the slideshow */
 }
 
 #announcement-slideshow img {
-    /* Let inline styles handle positioning and opacity */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 12px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#announcement-slideshow img.active {
+    opacity: 1;
+}
+
+/* ===== SERVICES & PORTFOLIO ADMIN CONTENT STYLING ===== */
+#content-image-wrapper {
+    max-width: 600px;
+    margin: 20px auto 0 auto;
+    text-align: center;
+}
+
+#content-image {
+    max-width: 100%;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    object-fit: cover;
+    border: 2px solid #cccccc; /* Debug: grey border to see if image is there */
+}
+
+#content-slideshow {
+    max-width: 100%;
+    max-height: 300px;
+    min-height: 200px; /* Ensure minimum height for visibility */
+    width: 100%;
+    height: 200px; /* Fixed height for slideshow */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #00ff00; /* Debug: green border to see if slideshow is there */
+    background-color: #f0f0f0; /* Debug: light background to see container */
+}
+
+#content-slideshow img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#content-slideshow img.active {
+    opacity: 1;
 }
 
 /* Desktop specific styling for smaller, cuter images */
 @media screen and (min-width: 1024px) {
-    #announcement-image-wrapper {
+    #announcement-image-wrapper,
+    #content-image-wrapper {
         max-width: 500px;
     }
     
-    #announcement-image {
+    #announcement-image,
+    #content-image {
         max-height: 250px;
     }
     
-    #announcement-slideshow {
+    #announcement-slideshow,
+    #content-slideshow {
         max-height: 250px;
     }
 }
 
 /* Tablet responsive */
 @media screen and (max-width: 1023px) and (min-width: 769px) {
-    #announcement-image-wrapper {
+    #announcement-image-wrapper,
+    #content-image-wrapper {
         max-width: 700px;
     }
     
-    #announcement-image {
+    #announcement-image,
+    #content-image {
         max-height: 280px;
     }
     
-    #announcement-slideshow {
+    #announcement-slideshow,
+    #content-slideshow {
         max-height: 280px;
     }
 }
 
 /* Mobile responsive */
 @media screen and (max-width: 768px) {
-    #admin-announcement {
+    #admin-announcement,
+    #admin-content {
         padding: 30px 3%;
     }
     
-    #announcement-image-wrapper {
+    #announcement-image-wrapper,
+    #content-image-wrapper {
         max-width: 100%;
         margin: 15px 0 0 0;
     }
     
-    #announcement-image {
+    #announcement-image,
+    #content-image {
         max-height: 200px;
     }
     
-    #announcement-slideshow {
+    #announcement-slideshow,
+    #content-slideshow {
         max-height: 200px;
     }
 }
 
 /* Small mobile devices */
 @media screen and (max-width: 480px) {
-    #admin-announcement {
+    #admin-announcement,
+    #admin-content {
         padding: 20px 2%;
     }
     
-    #announcement-image-wrapper {
+    #announcement-image-wrapper,
+    #content-image-wrapper {
         margin: 10px 0 0 0;
     }
     
-    #announcement-image {
+    #announcement-image,
+    #content-image {
         max-height: 150px;
     }
     
-    #announcement-slideshow {
+    #announcement-slideshow,
+    #content-slideshow {
         max-height: 150px;
     }
 }
