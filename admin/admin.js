@@ -6,6 +6,7 @@ class AdminDashboard {
         this.currentSection = 'dashboard';
         this.notificationInterval = null;
         this.useLocalContent = true; // Frontend-only CMS mode
+        this.currentContentImageFile = null;
         
         // API URL configuration for production
         this.apiBaseUrl = window.location.hostname === 'localhost' 
@@ -82,14 +83,10 @@ class AdminDashboard {
             contentImage.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    this.currentContentImageUrl = reader.result; // base64 data URL
-                    const img = document.getElementById('contentImagePreview');
-                    img.src = reader.result;
-                    img.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+                this.currentContentImageFile = file;
+                const img = document.getElementById('contentImagePreview');
+                img.src = URL.createObjectURL(file);
+                img.style.display = 'block';
             });
         }
 
@@ -635,6 +632,7 @@ class AdminDashboard {
     resetContentForm() {
         this.currentContentId = null;
         this.currentContentImageUrl = null;
+        this.currentContentImageFile = null;
         document.getElementById('contentLocation').value = 'home';
         document.getElementById('contentSlot').value = 'announcement';
         document.getElementById('contentTitle').value = '';
@@ -662,6 +660,7 @@ class AdminDashboard {
                 document.getElementById('contentBody').value = item.body || '';
                 document.getElementById('contentPublished').checked = !!item.is_published;
                 this.currentContentImageUrl = item.image_url || null;
+                this.currentContentImageFile = null;
                 const img = document.getElementById('contentImagePreview');
                 if (this.currentContentImageUrl) { 
                     img.src = this.currentContentImageUrl; 
@@ -695,6 +694,31 @@ class AdminDashboard {
             is_published: document.getElementById('contentPublished').checked
         };
         console.log('Content payload:', payload);
+
+        // If a file is selected, upload it first to get a URL
+        if (this.currentContentImageFile) {
+            const formData = new FormData();
+            formData.append('image', this.currentContentImageFile);
+            try {
+                const uploadRes = await fetch(`${this.apiBaseUrl}/api/admin/contents/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${this.token}` },
+                    body: formData
+                });
+                const uploadData = await uploadRes.json();
+                if (uploadData && uploadData.success && uploadData.url) {
+                    payload.image_url = uploadData.url;
+                } else {
+                    console.error('Image upload failed:', uploadData);
+                    this.showError('Failed to upload image');
+                    return;
+                }
+            } catch (uploadErr) {
+                console.error('Image upload error:', uploadErr);
+                this.showError('Failed to upload image');
+                return;
+            }
+        }
 
         try {
             let response;
