@@ -17,7 +17,7 @@ const corsOptions = {
       'http://localhost:3001', 
       'https://www.mysite.com',
       'https://mysite.com',
-      'https://zidalco.vercel.app', // Vercel preview URLs
+      'https://z-idalco.vercel.app', // Vercel preview URLs
       /^https:\/\/.*\.vercel\.app$/ // All Vercel preview URLs
     ];
     
