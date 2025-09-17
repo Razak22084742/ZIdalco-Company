@@ -4,9 +4,11 @@ const { supabase } = require('../utils/supabaseClient');
 const { authenticateUser, createUser } = require('../utils/userDatabase');
 const { loginRateLimiter, recordFailedAttempt, recordSuccessfulLogin } = require('../utils/rateLimiter');
 const axios = require('axios');
+const { authMiddleware } = require('../videos/middleware/auth');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const USE_MOCK = String(process.env.SUPABASE_MOCK).toLowerCase() === 'true' || !SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || SUPABASE_KEY;
 
 // POST /api/auth/login using proper authentication
 router.post('/login', loginRateLimiter, async (req, res) => {
@@ -171,3 +173,39 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 module.exports = router;
+
+// Change password for logged-in admin
+router.post('/change-password', authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body || {};
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({ error: true, message: 'New password must be at least 8 characters' });
+    }
+
+    if (USE_MOCK) {
+      // Validate current password against mock DB and update
+      const { findUserByEmail, verifyPassword, hashPassword } = require('../utils/userDatabase');
+      const user = findUserByEmail(req.user.email);
+      if (!user) return res.status(400).json({ error: true, message: 'User not found' });
+      const ok = await verifyPassword(currentPassword, user.password);
+      if (!ok) return res.status(400).json({ error: true, message: 'Current password is incorrect' });
+      user.password = await hashPassword(newPassword);
+      return res.json({ success: true, message: 'Password changed successfully' });
+    }
+
+    // Use Supabase Admin API with service key
+    if (!SUPABASE_SERVICE_KEY) {
+      return res.status(400).json({ error: true, message: 'Service key not configured' });
+    }
+
+    const { createClient } = require('@supabase/supabase-js');
+    const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } });
+    const userId = req.user.id;
+    const { data, error } = await adminClient.auth.admin.updateUserById(userId, { password: newPassword });
+    if (error) return res.status(400).json({ error: true, message: error.message });
+    return res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return res.status(500).json({ error: true, message: 'Failed to change password' });
+  }
+});

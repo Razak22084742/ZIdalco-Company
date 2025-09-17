@@ -1214,9 +1214,29 @@ class AdminDashboard {
             return;
         }
         
-        // Change password logic here
-        this.showSuccess('Password changed successfully!');
-        document.getElementById('passwordForm').reset();
+        const btn = document.querySelector('#passwordForm button[type="submit"]');
+        this.setButtonLoading(btn, true);
+        try {
+            const res = await fetch(`${this.apiBaseUrl}/api/auth/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+            const data = await res.json();
+            if (data.success) {
+                this.showSuccess('Password changed successfully!');
+                document.getElementById('passwordForm').reset();
+            } else {
+                this.showError(data.message || 'Failed to change password');
+            }
+        } catch (e) {
+            this.showError('Failed to change password. Please try again.');
+        } finally {
+            this.setButtonLoading(btn, false);
+        }
     }
     
     startNotificationPolling() {
