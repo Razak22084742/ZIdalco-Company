@@ -32,23 +32,14 @@ class AdminDashboard {
             this.handleLogin();
         });
         
-        // Signup form
-        const signupForm = document.getElementById('signupForm');
-        if (signupForm) signupForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleSignup();
-        });
         
 
         // Password visibility toggles
         const toggleLoginBtn = document.getElementById('toggleLoginPassword');
         if (toggleLoginBtn) toggleLoginBtn.addEventListener('click', () => this.togglePasswordVisibility('loginPassword', 'toggleLoginPassword'));
-        const toggleSignupBtn = document.getElementById('toggleSignupPassword');
-        if (toggleSignupBtn) toggleSignupBtn.addEventListener('click', () => this.togglePasswordVisibility('signupPassword', 'toggleSignupPassword'));
-
-        // Tabs switching
+        // Tabs switching (login only)
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.switchAuthTab(btn.dataset.tab));
+            btn.addEventListener('click', () => this.switchAuthTab('login'));
         });
 
         // Forgot password
@@ -222,12 +213,12 @@ class AdminDashboard {
         this.navigateToSection('dashboard');
     }
 
-    switchAuthTab(tab){
+    switchAuthTab(){
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        const btn = document.querySelector(`.tab-btn[data-tab="login"]`);
         if (btn) btn.classList.add('active');
         document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-        const form = document.getElementById(tab === 'signup' ? 'signupForm' : 'loginForm');
+        const form = document.getElementById('loginForm');
         if (form) form.classList.add('active');
     }
     
@@ -981,30 +972,17 @@ class AdminDashboard {
         
         try {
             if (this.currentReplyType === 'email') {
-                // Handle email reply
-                const replyData = {
-                    email_id: this.currentReplyId,
-                    reply_message: replyMessage,
-                    admin_name: this.admin.name || 'Admin',
-                    created_at: new Date().toISOString()
-                };
-
-                // Save email reply
-                const response = await fetch(`${this.apiBaseUrl}/api/emails/reply`, {
+                const response = await fetch(`${this.apiBaseUrl}/api/admin/reply-email`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.token}`
                     },
-                    body: JSON.stringify(replyData)
+                    body: JSON.stringify({ email_id: this.currentReplyId, reply_message: replyMessage })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    // Update email status to 'replied'
                     await this.updateEmailStatus(this.currentReplyId, 'replied');
-                    
                     this.showSuccess('Reply sent successfully!');
                     this.closeReplyModal();
                     this.loadEmails();
@@ -1013,30 +991,17 @@ class AdminDashboard {
                     throw new Error(data.message || 'Failed to save email reply');
                 }
             } else {
-                // Handle feedback reply
-                const replyData = {
-                    feedback_id: this.currentReplyId,
-                    reply_message: replyMessage,
-                    admin_name: this.admin.name || 'Admin',
-                    created_at: new Date().toISOString()
-                };
-
-                // Save reply to mock database
-                const response = await fetch(`${this.apiBaseUrl}/api/feedback/reply`, {
+                const response = await fetch(`${this.apiBaseUrl}/api/admin/reply-feedback`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.token}`
                     },
-                    body: JSON.stringify(replyData)
+                    body: JSON.stringify({ feedback_id: this.currentReplyId, reply_message: replyMessage })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    // Update feedback status to 'replied'
                     await this.updateFeedbackStatus(this.currentReplyId, 'replied');
-                    
                     this.showSuccess('Reply sent successfully!');
                     this.closeReplyModal();
                     this.loadFeedback();
