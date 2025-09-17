@@ -13,8 +13,9 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
-      'https://zidalco.vercel.app', // Vercel preview URLs
-      /^https:\/\/.*\.vercel\.app$/ // All Vercel preview URLs
+      'https://z-idalco.vercel.app',
+      'https://zidalco.vercel.app',
+      /^https:\/\/.*\.vercel\.app$/
     ];
     
     const isAllowed = allowedOrigins.some(allowedOrigin => {

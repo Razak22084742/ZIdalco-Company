@@ -74,13 +74,64 @@ router.post('/login', loginRateLimiter, async (req, res) => {
   }
 });
 
-// POST /api/auth/signup - DISABLED FOR SECURITY
+// POST /api/auth/signup - TEMPORARILY ENABLED VIA ENV FOR ADMIN ONLY
 router.post('/signup', async (req, res) => {
-  // Signup is disabled for security - only one admin account is allowed
-  res.status(403).json({ 
-    error: true, 
-    message: 'Admin signup is disabled. Contact system administrator for access.' 
-  });
+  try {
+    const enabled = String(process.env.ADMIN_SIGNUP_ENABLED).toLowerCase() === 'true';
+    if (!enabled) {
+      return res.status(403).json({ error: true, message: 'Signup is disabled' });
+    }
+
+    const { email, password, name } = req.body || {};
+    if (!email || !password) {
+      return res.status(400).json({ error: true, message: 'Email and password are required' });
+    }
+
+    // Only allow allowlisted admin emails to sign up
+    const allowedEmails = String(process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+    if (!allowedEmails.includes(String(email).toLowerCase())) {
+      return res.status(403).json({ error: true, message: 'Email not allowed for admin signup' });
+    }
+
+    if (USE_MOCK) {
+      const { createUser } = require('../utils/userDatabase');
+      const user = await createUser({ name: name || 'Admin', email, password });
+      // Issue a mock token and return
+      const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
+      return res.json({ success: true, message: 'Signup successful', token, admin: { id: user.id, name: user.name, email: user.email } });
+    }
+
+    // Supabase signup with admin role metadata
+    try {
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name: name || 'Admin', role: 'admin' }
+        }
+      });
+      if (signUpError) {
+        return res.status(400).json({ error: true, message: signUpError.message });
+      }
+
+      // Attempt immediate sign-in to return access token (some projects require email confirm; handle both)
+      try {
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+        if (loginError) {
+          // Return success without token if email confirmation is required
+          return res.json({ success: true, message: 'Signup successful. Please verify email to log in.' });
+        }
+        return res.json({ success: true, message: 'Signup successful', token: loginData.session.access_token, admin: { id: loginData.user?.id, name: loginData.user?.user_metadata?.name, email } });
+      } catch (loginCatch) {
+        return res.json({ success: true, message: 'Signup successful. Please verify email to log in.' });
+      }
+    } catch (e) {
+      return res.status(400).json({ error: true, message: 'Signup failed' });
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: true, message: 'Signup failed' });
+  }
 });
 
 // POST /api/auth/forgot-password using Supabase Auth

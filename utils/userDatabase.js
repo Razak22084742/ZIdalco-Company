@@ -5,8 +5,9 @@ let users = [
   {
     id: 1,
     name: 'Admin',
-    email: 'admin@zidalco.com',
-    password: '$2a$10$VqJTMf6AUNWwyyjTRz2h/OVsUkJshfBrbRTLQ./BwDBW0G2IsF2XO', // password: admin123
+    email: 'zidalcoltd@gmail.com',
+    // password: Admin123 (pre-hashed)
+    password: '$2a$10$NWObY6aLxZRBJbBTv1N9eO7QK9y9wOA5X0b2aU5a7Z7hpx9L4V4dS',
     role: 'admin',
     created_at: new Date().toISOString()
   }
