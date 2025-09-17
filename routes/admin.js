@@ -120,8 +120,7 @@ router.post('/reply-feedback', async (req, res) => {
 
     const replyData = {
       feedback_id: Number(feedback_id),
-      admin_id: null,
-      admin_name: req.user?.name || req.user?.email || 'Admin',
+      // Schema has no admin_name column. Store only allowed fields.
       reply_message,
       created_at: new Date().toISOString()
     };
@@ -177,7 +176,6 @@ router.post('/reply-email', async (req, res) => {
 
     const replyData = {
       email_id: Number(email_id),
-      // Do not include admin_id for compatibility with schema referencing admins(id)
       reply_message,
       created_at: new Date().toISOString()
     };
