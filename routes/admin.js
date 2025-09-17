@@ -119,8 +119,8 @@ router.post('/reply-feedback', async (req, res) => {
 
     const replyData = {
       feedback_id: feedback_id.toString(),
-      admin_id: req.user?.id || null,
-      admin_name: req.user?.name || 'Admin',
+      admin_id: null,
+      admin_name: req.user?.name || req.user?.email || 'Admin',
       reply_message,
       created_at: new Date().toISOString()
     };
@@ -154,8 +154,8 @@ router.post('/reply-feedback', async (req, res) => {
 
     res.json({ success: true, message: 'Reply sent successfully' });
   } catch (error) {
-    console.error('Reply feedback error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to send reply' });
+    console.error('Reply feedback error:', error);
+    res.status(500).json({ error: true, message: 'Failed to send reply' });
   }
 });
 
@@ -200,8 +200,8 @@ router.post('/reply-email', async (req, res) => {
 
     res.json({ success: true, message: 'Reply sent successfully' });
   } catch (error) {
-    console.error('Reply email error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to send reply' });
+    console.error('Reply email error:', error);
+    res.status(500).json({ error: true, message: 'Failed to send reply' });
   }
 });
 
@@ -263,8 +263,8 @@ router.get('/feedback', async (req, res) => {
       res.status(500).json({ error: true, message: 'Failed to fetch feedback' });
     }
   } catch (error) {
-    console.error('Admin list feedback error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to fetch feedback' });
+    console.error('Admin list feedback error:', error);
+    res.status(500).json({ error: true, message: 'Failed to fetch feedback' });
   }
 });
 
@@ -294,8 +294,8 @@ router.get('/feedback/:id', async (req, res) => {
       res.status(404).json({ error: true, message: 'Feedback not found' });
     }
   } catch (error) {
-    console.error('Admin get feedback by ID error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to fetch feedback' });
+    console.error('Admin get feedback by ID error:', error);
+    res.status(500).json({ error: true, message: 'Failed to fetch feedback' });
   }
 });
 
@@ -318,8 +318,8 @@ router.delete('/feedback/:id', async (req, res) => {
     }
     return res.status(500).json({ error: true, message: 'Failed to remove feedback' });
   } catch (error) {
-    console.error('Delete feedback error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to remove feedback' });
+    console.error('Delete feedback error:', error);
+    res.status(500).json({ error: true, message: 'Failed to remove feedback' });
   }
 });
 
@@ -340,8 +340,8 @@ router.get('/emails', async (req, res) => {
       res.status(500).json({ error: true, message: 'Failed to fetch emails' });
     }
   } catch (error) {
-    console.error('Admin list emails error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to fetch emails' });
+    console.error('Admin list emails error:', error);
+    res.status(500).json({ error: true, message: 'Failed to fetch emails' });
   }
 });
 
@@ -356,8 +356,8 @@ router.get('/emails/:id', async (req, res) => {
       res.status(404).json({ error: true, message: 'Email not found' });
     }
   } catch (error) {
-    console.error('Admin get email by ID error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to fetch email' });
+    console.error('Admin get email by ID error:', error);
+    res.status(500).json({ error: true, message: 'Failed to fetch email' });
   }
 });
 
@@ -377,8 +377,8 @@ router.delete('/emails/:id', async (req, res) => {
     }
     return res.status(500).json({ error: true, message: 'Failed to remove email' });
   } catch (error) {
-    console.error('Delete email error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to remove email' });
+    console.error('Delete email error:', error);
+    res.status(500).json({ error: true, message: 'Failed to remove email' });
   }
 });
 
@@ -395,8 +395,8 @@ router.get('/contents', async (req, res) => {
     if (result.status === 200) return res.json({ success: true, contents: result.data });
     return res.status(500).json({ error: true, message: 'Failed to fetch contents' });
   } catch (error) {
-    console.error('List contents error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to fetch contents' });
+    console.error('List contents error:', error);
+    res.status(500).json({ error: true, message: 'Failed to fetch contents' });
   }
 });
 
@@ -410,8 +410,8 @@ router.post('/contents', async (req, res) => {
     if (result.status >= 200 && result.status < 300) return res.json({ success: true, content: result.data?.[0] || payload });
     return res.status(500).json({ error: true, message: 'Failed to create content' });
   } catch (error) {
-    console.error('Create content error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to create content' });
+    console.error('Create content error:', error);
+    res.status(500).json({ error: true, message: 'Failed to create content' });
   }
 });
 
@@ -424,8 +424,8 @@ router.patch('/contents/:id', async (req, res) => {
     if (result.status >= 200 && result.status < 300) return res.json({ success: true, content: result.data?.[0] || null });
     return res.status(500).json({ error: true, message: 'Failed to update content' });
   } catch (error) {
-    console.error('Update content error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to update content' });
+    console.error('Update content error:', error);
+    res.status(500).json({ error: true, message: 'Failed to update content' });
   }
 });
 
@@ -437,8 +437,8 @@ router.delete('/contents/:id', async (req, res) => {
     if (result.status >= 200 && result.status < 300) return res.json({ success: true, message: 'Content removed' });
     return res.status(500).json({ error: true, message: 'Failed to remove content' });
   } catch (error) {
-    console.error('Delete content error:', error?.message || error);
-    res.status(500).json({ error: true, message: error?.message || 'Failed to remove content' });
+    console.error('Delete content error:', error);
+    res.status(500).json({ error: true, message: 'Failed to remove content' });
   }
 });
 
