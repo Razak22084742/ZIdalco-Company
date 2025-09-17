@@ -1124,21 +1124,8 @@ img {
 }
 
 #announcement-slideshow img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    /* Let inline styles handle positioning and opacity */
     border-radius: 12px;
-    opacity: 0 !important;
-    transition: opacity 1s ease-in-out;
-    z-index: 1;
-}
-
-#announcement-slideshow img.active {
-    opacity: 1 !important;
-    z-index: 2;
 }
 
 /* Desktop specific styling for smaller, cuter images */
