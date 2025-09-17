@@ -458,9 +458,24 @@
                             const slideshowInterval = setInterval(()=>{
                                 const imgs = slideEl.querySelectorAll('img');
                                 console.log('Slideshow rotation - current index:', idx, 'total images:', imgs.length);
-                                imgs.forEach((img,i)=>{ 
-                                    img.classList.toggle('active', i === idx);
+                                
+                                // Remove active class from all images first
+                                imgs.forEach((img)=>{ 
+                                    img.classList.remove('active');
                                 });
+                                
+                                // Add active class to current image
+                                if (imgs[idx]) {
+                                    imgs[idx].classList.add('active');
+                                    console.log('Activated image at index:', idx);
+                                    
+                                    // Debug: Check opacity values
+                                    imgs.forEach((img, i) => {
+                                        const computedStyle = window.getComputedStyle(img);
+                                        console.log(`Image ${i} opacity:`, computedStyle.opacity, 'active class:', img.classList.contains('active'));
+                                    });
+                                }
+                                
                                 idx = (idx + 1) % imgs.length;
                             }, 3000);
                             

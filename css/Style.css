@@ -1131,12 +1131,14 @@ img {
     height: 100%;
     object-fit: cover;
     border-radius: 12px;
-    opacity: 0;
+    opacity: 0 !important;
     transition: opacity 1s ease-in-out;
+    z-index: 1;
 }
 
 #announcement-slideshow img.active {
-    opacity: 1;
+    opacity: 1 !important;
+    z-index: 2;
 }
 
 /* Desktop specific styling for smaller, cuter images */
