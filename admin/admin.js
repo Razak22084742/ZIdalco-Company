@@ -81,12 +81,30 @@ class AdminDashboard {
         const contentImage = document.getElementById('contentImage');
         if (contentImage) {
             contentImage.addEventListener('change', (e) => {
-                const file = e.target.files && e.target.files[0];
-                if (!file) return;
-                this.currentContentImageFile = file;
-                const img = document.getElementById('contentImagePreview');
-                img.src = URL.createObjectURL(file);
-                img.style.display = 'block';
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                
+                this.currentContentImageFiles = Array.from(files);
+                const previewContainer = document.getElementById('contentImagePreview');
+                const imageContainer = document.getElementById('imagePreviewContainer');
+                
+                // Clear previous previews
+                imageContainer.innerHTML = '';
+                
+                // Show preview for each selected image
+                this.currentContentImageFiles.forEach((file, index) => {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.style.maxWidth = '100px';
+                    img.style.maxHeight = '100px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '4px';
+                    img.style.border = '2px solid #ddd';
+                    img.title = file.name;
+                    imageContainer.appendChild(img);
+                });
+                
+                previewContainer.style.display = 'block';
             });
         }
 
@@ -633,13 +651,18 @@ class AdminDashboard {
         this.currentContentId = null;
         this.currentContentImageUrl = null;
         this.currentContentImageFile = null;
+        this.currentContentImageFiles = null;
         document.getElementById('contentLocation').value = 'home';
         document.getElementById('contentSlot').value = 'announcement';
         document.getElementById('contentTitle').value = '';
         document.getElementById('contentBody').value = '';
         document.getElementById('contentPublished').checked = true;
-        const img = document.getElementById('contentImagePreview');
-        if (img) { img.src = ''; img.style.display = 'none'; }
+        document.getElementById('contentImage').value = '';
+        
+        const previewContainer = document.getElementById('contentImagePreview');
+        const imageContainer = document.getElementById('imagePreviewContainer');
+        if (previewContainer) previewContainer.style.display = 'none';
+        if (imageContainer) imageContainer.innerHTML = '';
     }
 
     async editContent(id) {
@@ -661,13 +684,54 @@ class AdminDashboard {
                 document.getElementById('contentPublished').checked = !!item.is_published;
                 this.currentContentImageUrl = item.image_url || null;
                 this.currentContentImageFile = null;
-                const img = document.getElementById('contentImagePreview');
-                if (this.currentContentImageUrl) { 
-                    img.src = this.currentContentImageUrl; 
-                    img.style.display = 'block'; 
-                } else { 
-                    img.src=''; 
-                    img.style.display='none'; 
+                this.currentContentImageFiles = null;
+                
+                const previewContainer = document.getElementById('contentImagePreview');
+                const imageContainer = document.getElementById('imagePreviewContainer');
+                
+                if (this.currentContentImageUrl) {
+                    try {
+                        // Try to parse as JSON array first
+                        let urls = [];
+                        if (this.currentContentImageUrl.startsWith('[')) {
+                            urls = JSON.parse(this.currentContentImageUrl);
+                        } else if (this.currentContentImageUrl.includes(',')) {
+                            urls = this.currentContentImageUrl.split(',').map(s => s.trim());
+                        } else {
+                            urls = [this.currentContentImageUrl];
+                        }
+                        
+                        // Clear previous previews
+                        imageContainer.innerHTML = '';
+                        
+                        // Show preview for each image
+                        urls.forEach((url, index) => {
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.style.maxWidth = '100px';
+                            img.style.maxHeight = '100px';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = '4px';
+                            img.style.border = '2px solid #ddd';
+                            img.title = `Image ${index + 1}`;
+                            imageContainer.appendChild(img);
+                        });
+                        
+                        previewContainer.style.display = 'block';
+                    } catch (error) {
+                        console.error('Error parsing image URLs:', error);
+                        // Fallback to single image display
+                        const img = document.createElement('img');
+                        img.src = this.currentContentImageUrl;
+                        img.style.maxWidth = '200px';
+                        img.style.marginTop = '8px';
+                        imageContainer.innerHTML = '';
+                        imageContainer.appendChild(img);
+                        previewContainer.style.display = 'block';
+                    }
+                } else {
+                    previewContainer.style.display = 'none';
+                    imageContainer.innerHTML = '';
                 }
             } else {
                 this.showError('Content not found');
@@ -695,27 +759,36 @@ class AdminDashboard {
         };
         console.log('Content payload:', payload);
 
-        // If a file is selected, upload it first to get a URL
-        if (this.currentContentImageFile) {
-            const formData = new FormData();
-            formData.append('image', this.currentContentImageFile);
-            try {
-                const uploadRes = await fetch(`${this.apiBaseUrl}/api/admin/contents/upload`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${this.token}` },
-                    body: formData
-                });
-                const uploadData = await uploadRes.json();
-                if (uploadData && uploadData.success && uploadData.url) {
-                    payload.image_url = uploadData.url;
-                } else {
-                    console.error('Image upload failed:', uploadData);
-                    this.showError('Failed to upload image');
-                    return;
+        // If files are selected, upload them first to get URLs
+        if (this.currentContentImageFiles && this.currentContentImageFiles.length > 0) {
+            const uploadPromises = this.currentContentImageFiles.map(async (file) => {
+                const formData = new FormData();
+                formData.append('image', file);
+                try {
+                    const uploadRes = await fetch(`${this.apiBaseUrl}/api/admin/contents/upload`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${this.token}` },
+                        body: formData
+                    });
+                    const uploadData = await uploadRes.json();
+                    if (uploadData && uploadData.success && uploadData.url) {
+                        return uploadData.url;
+                    } else {
+                        console.error('Image upload failed:', uploadData);
+                        throw new Error('Failed to upload image');
+                    }
+                } catch (uploadErr) {
+                    console.error('Image upload error:', uploadErr);
+                    throw uploadErr;
                 }
+            });
+
+            try {
+                const uploadedUrls = await Promise.all(uploadPromises);
+                // Store multiple URLs as JSON array
+                payload.image_url = JSON.stringify(uploadedUrls);
             } catch (uploadErr) {
-                console.error('Image upload error:', uploadErr);
-                this.showError('Failed to upload image');
+                this.showError('Failed to upload one or more images');
                 return;
             }
         }
