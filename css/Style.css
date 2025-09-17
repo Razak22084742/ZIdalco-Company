@@ -1090,6 +1090,7 @@ img {
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 5%;
+    background-color: #f9f9f9; /* Grey background */
 }
 
 #announcement-image-wrapper {
@@ -1140,6 +1141,13 @@ img {
 }
 
 /* ===== SERVICES & PORTFOLIO ADMIN CONTENT STYLING ===== */
+#admin-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 5%;
+    background-color: #f9f9f9; /* Grey background */
+}
+
 #content-image-wrapper {
     max-width: 600px;
     margin: 20px auto 0 auto;
