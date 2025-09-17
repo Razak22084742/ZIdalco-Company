@@ -418,6 +418,12 @@
                     const raw = (c.image_url||'').trim();
                     const slideEl = document.getElementById('announcement-slideshow');
                     const singleImg = document.getElementById('announcement-image');
+                    
+                    // Clear any existing slideshow interval
+                    if (slideEl.dataset.intervalId) {
+                        clearInterval(parseInt(slideEl.dataset.intervalId));
+                        slideEl.dataset.intervalId = '';
+                    }
                     try {
                         let urls = [];
                         if (raw.startsWith('[')) {
@@ -433,20 +439,33 @@
                         
                         if (urls.length > 1) {
                             console.log('Creating slideshow with', urls.length, 'images');
+                            console.log('URLs for slideshow:', urls);
+                            
                             // Multiple images - create slideshow
-                            slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" style="position:absolute;top:0;left:0;width:100%;height:100%;display:${i===0?'block':'none'};object-fit:cover;border-radius:12px;">`).join('');
+                            slideEl.innerHTML = urls.map((u,i)=>`<img src="${u}" class="${i===0?'active':''}" alt="Slideshow image ${i+1}">`).join('');
                             slideEl.style.display = 'block';
                             singleImg.style.display = 'none';
                             
+                            console.log('Slideshow HTML created:', slideEl.innerHTML);
+                            console.log('Slideshow container dimensions:', {
+                                width: slideEl.offsetWidth,
+                                height: slideEl.offsetHeight,
+                                display: slideEl.style.display
+                            });
+                            
                             // Auto-rotate slideshow
                             let idx = 0;
-                            setInterval(()=>{
+                            const slideshowInterval = setInterval(()=>{
                                 const imgs = slideEl.querySelectorAll('img');
+                                console.log('Slideshow rotation - current index:', idx, 'total images:', imgs.length);
                                 imgs.forEach((img,i)=>{ 
-                                    img.style.display = i===idx? 'block':'none'; 
+                                    img.classList.toggle('active', i === idx);
                                 });
                                 idx = (idx + 1) % imgs.length;
                             }, 3000);
+                            
+                            // Store interval ID for potential cleanup
+                            slideEl.dataset.intervalId = slideshowInterval;
                         } else if (urls.length === 1) {
                             console.log('Displaying single image:', urls[0]);
                             // Single image
