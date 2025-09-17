@@ -32,10 +32,24 @@ class AdminDashboard {
             this.handleLogin();
         });
         
+        // Signup form
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSignup();
+        });
+        
 
         // Password visibility toggles
         const toggleLoginBtn = document.getElementById('toggleLoginPassword');
         if (toggleLoginBtn) toggleLoginBtn.addEventListener('click', () => this.togglePasswordVisibility('loginPassword', 'toggleLoginPassword'));
+        const toggleSignupBtn = document.getElementById('toggleSignupPassword');
+        if (toggleSignupBtn) toggleSignupBtn.addEventListener('click', () => this.togglePasswordVisibility('signupPassword', 'toggleSignupPassword'));
+
+        // Tabs switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.switchAuthTab(btn.dataset.tab));
+        });
 
         // Forgot password
         const forgotBtn = document.getElementById('forgotPasswordBtn');
@@ -149,6 +163,42 @@ class AdminDashboard {
         }
     }
     
+    async handleSignup() {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const submitBtn = document.getElementById('signupSubmitBtn');
+        this.setButtonLoading(submitBtn, true);
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/api/auth/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                if (data.token) {
+                    this.token = data.token;
+                    this.admin = data.admin || { email, name };
+                    localStorage.setItem('admin_token', this.token);
+                    localStorage.setItem('admin_data', JSON.stringify(this.admin));
+                    this.showSuccess('Account created successfully');
+                    this.showDashboard();
+                    this.loadDashboardData();
+                } else {
+                    this.showSuccess(data.message || 'Signup successful. Check your email to verify.');
+                    this.switchAuthTab('login');
+                }
+            } else {
+                this.showError(data.message || 'Signup failed');
+            }
+        } catch (error) {
+            this.showError('Signup failed. Please try again.');
+        } finally {
+            this.setButtonLoading(submitBtn, false);
+        }
+    }
+
     
     checkAuth() {
         if (this.token) {
@@ -170,6 +220,15 @@ class AdminDashboard {
         
         document.getElementById('adminName').textContent = this.admin.name || this.admin.email || 'Admin';
         this.navigateToSection('dashboard');
+    }
+
+    switchAuthTab(tab){
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        if (btn) btn.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        const form = document.getElementById(tab === 'signup' ? 'signupForm' : 'loginForm');
+        if (form) form.classList.add('active');
     }
     
     navigateToSection(section) {
