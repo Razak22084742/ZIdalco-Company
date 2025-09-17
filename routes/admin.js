@@ -174,7 +174,7 @@ router.post('/reply-email', async (req, res) => {
 
     const replyData = {
       email_id,
-      admin_id: null,
+      // Do not include admin_id for compatibility with schema referencing admins(id)
       reply_message,
       created_at: new Date().toISOString()
     };
@@ -403,12 +403,17 @@ router.get('/contents', async (req, res) => {
 // POST /api/admin/contents
 router.post('/contents', async (req, res) => {
   try {
-    const { location, slot, title, body, image_url, is_published = true } = req.body || {};
+    const { location, slot } = req.body || {};
+    let { title, body, image_url, is_published = true } = req.body || {};
     if (!location || !slot) return res.status(400).json({ error: true, message: 'location and slot are required' });
+    // Coerce potential non-string inputs into strings
+    if (title != null && typeof title !== 'string') title = JSON.stringify(title);
+    if (body != null && typeof body !== 'string') body = JSON.stringify(body);
+    if (image_url != null && typeof image_url !== 'string') image_url = String(image_url);
     const payload = { location, slot, title: title || null, body: body || null, image_url: image_url || null, is_published: Boolean(is_published) };
     const result = await supabaseRequest('contents', 'POST', payload);
     if (result.status >= 200 && result.status < 300) return res.json({ success: true, content: result.data?.[0] || payload });
-    return res.status(500).json({ error: true, message: 'Failed to create content' });
+    return res.status(500).json({ error: true, message: 'Failed to create content', details: result.data });
   } catch (error) {
     console.error('Create content error:', error);
     res.status(500).json({ error: true, message: 'Failed to create content' });
